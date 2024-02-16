@@ -1,15 +1,15 @@
 package com.nitcoders.model;
 
-public class Stimuli
+public class Stimulus
 {
 	private String sentence;
-	private String stimuliType;
+	private String stimulusType;
 	private String sampleFilename;
 
-	public Stimuli(String sentence, String stimuliType, String sampleFilename)
+	public Stimulus(String sentence, String stimulusType, String sampleFilename)
 	{
 		this.sentence = sentence;
-		this.stimuliType = stimuliType;
+		this.stimulusType = stimulusType;
 		this.sampleFilename = sampleFilename;
 	}
 
@@ -18,9 +18,9 @@ public class Stimuli
 		return sentence;
 	}
 
-	public String getStimuliType()
+	public String getStimulusType()
 	{
-		return stimuliType;
+		return stimulusType;
 	}
 
 	public String getSampleFilename()
@@ -33,9 +33,9 @@ public class Stimuli
 		this.sentence = sentence;
 	}
 
-	public void setStimuliType(String stimuliType)
+	public void setStimulusType(String stimulusType)
 	{
-		this.stimuliType = stimuliType;
+		this.stimulusType = stimulusType;
 	}
 
 	public void setSampleFilename(String sampleFilename)

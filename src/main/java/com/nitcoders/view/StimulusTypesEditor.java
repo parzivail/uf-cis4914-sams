@@ -9,7 +9,7 @@ import imgui.flag.ImGuiTableColumnFlags;
 import imgui.flag.ImGuiTableFlags;
 import imgui.type.ImString;
 
-public class StimuliTypesEditor
+public class StimulusTypesEditor
 {
 	private static final ImString stimulusValue = new ImString();
 
@@ -65,7 +65,7 @@ public class StimuliTypesEditor
 							if (choice == DialogUtil.Button.YES)
 							{
 								iterator.remove();
-								project.getStimuli().removeIf(stimuli -> stimuli.getStimuliType().equals(stimuliType));
+								project.getStimuli().removeIf(stimuli -> stimuli.getStimulusType().equals(stimuliType));
 							}
 						}
 					});

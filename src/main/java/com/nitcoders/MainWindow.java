@@ -2,7 +2,7 @@ package com.nitcoders;
 
 import com.nitcoders.util.IoUtil;
 import com.nitcoders.view.StimuliEditor;
-import com.nitcoders.view.StimuliTypesEditor;
+import com.nitcoders.view.StimulusTypesEditor;
 import imgui.ImFont;
 import imgui.ImFontConfig;
 import imgui.ImGui;
@@ -113,7 +113,7 @@ public class MainWindow extends Application
 		{
 			if (ImGui.beginTabItem("Stimulus Types"))
 			{
-				StimuliTypesEditor.draw(projectManager.getProject());
+				StimulusTypesEditor.draw(projectManager.getProject());
 				ImGui.endTabItem();
 			}
 

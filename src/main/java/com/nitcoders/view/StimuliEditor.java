@@ -3,7 +3,7 @@ package com.nitcoders.view;
 import com.nitcoders.IconFont;
 import com.nitcoders.MainWindow;
 import com.nitcoders.model.Project;
-import com.nitcoders.model.Stimuli;
+import com.nitcoders.model.Stimulus;
 import com.nitcoders.util.DialogUtil;
 import com.nitcoders.util.ImGuiHelper;
 import com.nitcoders.util.ListUtil;
@@ -11,17 +11,20 @@ import imgui.ImGui;
 import imgui.flag.ImGuiTableColumnFlags;
 import imgui.flag.ImGuiTableFlags;
 import imgui.type.ImInt;
+import imgui.type.ImString;
 
 public class StimuliEditor
 {
 	private static final ImInt selectedStimulusType = new ImInt();
+
+	private static Stimulus currentlyEditingStimulus = null;
 
 	public static void draw(Project project)
 	{
 		var innerSize = ImGui.getContentRegionAvail();
 		if (ImGui.beginTable("stimuliTable", 2, ImGuiTableFlags.Resizable | ImGuiTableFlags.NoHostExtendY, innerSize.x, innerSize.y))
 		{
-			ImGui.tableSetupColumn("label", ImGuiTableColumnFlags.WidthFixed, 400);
+			ImGui.tableSetupColumn("label", ImGuiTableColumnFlags.WidthFixed, 600);
 			ImGui.tableSetupColumn("field", ImGuiTableColumnFlags.WidthStretch);
 
 			ImGui.tableNextColumn();
@@ -38,7 +41,7 @@ public class StimuliEditor
 				if (ImGui.button("New Stimulus", -1, frameSize))
 				{
 					var stimuliType = stimulusTypes[selectedStimulusType.get()];
-					stimuli.add(0, new Stimuli("Sentence", stimuliType, null));
+					stimuli.add(0, new Stimulus("Sentence", stimuliType, null));
 				}
 
 				ImGui.pushFont(MainWindow.getSmallFont());
@@ -53,7 +56,7 @@ public class StimuliEditor
 						ImGui.text(type);
 
 						ImGui.tableNextColumn();
-						ImGui.text(String.valueOf(stimuli.stream().filter(s -> s.getStimuliType().equals(type)).count()));
+						ImGui.text(String.valueOf(stimuli.stream().filter(s -> s.getStimulusType().equals(type)).count()));
 					}
 
 					ImGui.tableNextColumn();
@@ -89,16 +92,13 @@ public class StimuliEditor
 
 						ImGui.pushFont(MainWindow.getSmallFont());
 						ImGui.indent();
-						ImGui.text(stimulus.getStimuliType());
+						ImGui.text(stimulus.getStimulusType());
 
-						ImGuiHelper.filePicker(
-								"Choose Audio##soundPicker%s".formatted(i),
-								stimulus::getSampleFilename,
-								stimulus::setSampleFilename,
-								"Open Sound",
-								"WAV files (*.wav)",
-								"*.wav"
-						);
+						if (stimulus.getSampleFilename() == null)
+							ImGui.textDisabled("No audio file selected");
+						else
+							ImGui.text(stimulus.getSampleFilename());
+
 						ImGui.unindent();
 						ImGui.popFont();
 
@@ -117,15 +117,12 @@ public class StimuliEditor
 						ImGui.sameLine();
 
 						if (ImGui.button("%s##edit%s".formatted(IconFont.greasepencil, i), frameSize, frameSize))
-						{
-							// TODO: editor
-						}
+							currentlyEditingStimulus = stimulus;
 
 						ImGui.sameLine();
 
 						if (ImGui.button("%s##delete%s".formatted(IconFont.trash, i), frameSize, frameSize))
 						{
-							// TODO: ask first
 							var choice = DialogUtil.notifyChoice(
 									"Delete stimulus",
 									"Are you sure you want to delete this stimulus?",
@@ -145,7 +142,50 @@ public class StimuliEditor
 
 			ImGui.tableNextColumn();
 
-			// TODO: right margin stuff
+			renderEditor(project, stimulusTypes);
+
+			ImGui.endTable();
+		}
+	}
+
+	private static void renderEditor(Project project, String[] stimulusTypes)
+	{
+		if (currentlyEditingStimulus == null)
+			return;
+
+		if (ImGui.beginTable("stimulusEditor", 2))
+		{
+			ImGui.tableSetupColumn("label", ImGuiTableColumnFlags.WidthFixed, 100);
+			ImGui.tableSetupColumn("field", ImGuiTableColumnFlags.WidthStretch);
+
+			var typeInt = new ImInt(project.getStimulusTypes().indexOf(currentlyEditingStimulus.getStimulusType()));
+
+			ImGui.tableNextColumn();
+			ImGui.text("Stimulus Type");
+			ImGui.tableNextColumn();
+			if (ImGui.combo("##editorStimulusType", typeInt, stimulusTypes))
+				currentlyEditingStimulus.setStimulusType(stimulusTypes[typeInt.get()]);
+
+			ImGui.tableNextColumn();
+			ImGui.text("Sentence");
+			ImGui.tableNextColumn();
+
+			var sentenceStr = new ImString(currentlyEditingStimulus.getSentence(), 512);
+			if (ImGui.inputText("##stimulusSentence", sentenceStr))
+				currentlyEditingStimulus.setSentence(sentenceStr.get());
+
+			ImGui.tableNextColumn();
+			ImGui.text("Audio Sample");
+			ImGui.tableNextColumn();
+
+			ImGuiHelper.filePicker(
+					"Choose File##stimulusSoundPicker",
+					currentlyEditingStimulus::getSampleFilename,
+					currentlyEditingStimulus::setSampleFilename,
+					"Open Sound",
+					"WAV files (*.wav)",
+					"*.wav"
+			);
 
 			ImGui.endTable();
 		}

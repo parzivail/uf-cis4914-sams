@@ -7,6 +7,7 @@ public class Project
 {
 	private List<String> stimulusTypes;
 	private List<Stimulus> stimuli;
+	private List<Subject> subjects;
 
 	public Project()
 	{
@@ -93,6 +94,8 @@ public class Project
 				new Stimulus("The goat that bit a newspaper chased the lamb.", "Subject-Subject (SS)", null),
 				new Stimulus("The nurse that checked the baby helped the doctor.", "Subject-Subject (SS)", null)
 		));
+
+		subjects = new ArrayList<>();
 	}
 
 	public List<Stimulus> getStimuli()
@@ -103,5 +106,10 @@ public class Project
 	public List<String> getStimulusTypes()
 	{
 		return stimulusTypes;
+	}
+
+	public List<Subject> getSubjects()
+	{
+		return subjects;
 	}
 }

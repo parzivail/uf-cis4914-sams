@@ -41,7 +41,7 @@ public class StimuliEditor
 				if (ImGui.button("New Stimulus", -1, frameSize))
 				{
 					var stimuliType = stimulusTypes[selectedStimulusType.get()];
-					stimuli.add(0, new Stimulus("Sentence", stimuliType, null));
+					stimuli.add(0, currentlyEditingStimulus = new Stimulus("Sentence", stimuliType, null));
 				}
 
 				ImGui.pushFont(MainWindow.getSmallFont());

@@ -3,6 +3,7 @@ package com.nitcoders;
 import com.nitcoders.util.IoUtil;
 import com.nitcoders.view.StimuliEditor;
 import com.nitcoders.view.StimulusTypesEditor;
+import com.nitcoders.view.SubjectsEditor;
 import imgui.ImFont;
 import imgui.ImFontConfig;
 import imgui.ImGui;
@@ -125,6 +126,7 @@ public class MainWindow extends Application
 
 			if (ImGui.beginTabItem("Subjects"))
 			{
+				SubjectsEditor.draw(projectManager.getProject());
 				ImGui.endTabItem();
 			}
 

@@ -4,6 +4,7 @@ import com.nitcoders.IconFont;
 import com.nitcoders.MainWindow;
 import com.nitcoders.model.Project;
 import com.nitcoders.model.Stimulus;
+import com.nitcoders.util.AudioUtil;
 import com.nitcoders.util.DialogUtil;
 import com.nitcoders.util.ImGuiHelper;
 import com.nitcoders.util.ListUtil;
@@ -107,10 +108,12 @@ public class StimuliEditor
 						ImGui.tableNextColumn();
 						ImGui.newLine();
 
-						ImGui.beginDisabled(stimulus.getSampleFilename() == null);
+						final var soundFilename = stimulus.getSampleFilename();
+
+						ImGui.beginDisabled(soundFilename == null);
 						if (ImGui.button("%s##preview%s".formatted(IconFont.play_sound, i), frameSize, frameSize))
 						{
-							// TODO: preview sound
+							AudioUtil.tryPlay(soundFilename);
 						}
 						ImGui.endDisabled();
 

@@ -1,18 +1,33 @@
 package com.nitcoders;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.nitcoders.model.Config;
 import com.nitcoders.model.Project;
 import com.nitcoders.model.ProjectReference;
+import com.nitcoders.util.DialogUtil;
 
-import java.util.List;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ProjectManager
 {
+	private static final String CONFIG_FILE = "config.json";
+	private static final String PROJECT_FILE_FILTER = "*.sams";
+	private static final Gson GSON = new GsonBuilder()
+			.create();
+
+	private String filename;
 	private Project currentProject;
+
+	private Config config;
 
 	public ProjectManager()
 	{
-		// TODO: this is temporary
-		currentProject = new Project();
+		loadConfig();
 	}
 
 	public Project getProject()
@@ -20,33 +35,104 @@ public class ProjectManager
 		return currentProject;
 	}
 
+	public void createProject()
+	{
+		this.currentProject = new Project();
+		this.filename = null;
+	}
+
 	public void openProject()
 	{
-		// TODO: prompt user to select a project file and call openProject(String)
+		DialogUtil.openFile("Open Project", "SAMS Project (*.sams)", false, PROJECT_FILE_FILTER)
+		          .ifPresent(paths -> {
+			          openProject(paths[0]);
+		          });
 	}
 
 	public void openProject(String filename)
 	{
-		// TODO: open the given project and set the current project
+		try
+		{
+			currentProject = GSON.fromJson(Files.readString(Path.of(filename)), Project.class);
+			this.filename = filename;
+
+			config.recentProjects().add(new ProjectReference(new File(filename).getName(), filename));
+			saveConfig();
+		}
+		catch (Exception e)
+		{
+			DialogUtil.notify("Error", "Could not open project: " + e.getMessage(), DialogUtil.Icon.ERROR);
+		}
 	}
 
 	public void saveProject()
 	{
-		// TODO: write the current project to disk
+		if (filename == null)
+		{
+			saveProjectAs();
+			return;
+		}
+
+		try
+		{
+			Files.writeString(Path.of(filename), GSON.toJson(this));
+		}
+		catch (Exception e)
+		{
+			DialogUtil.notify("Error", "Could not save project: " + e.getMessage(), DialogUtil.Icon.ERROR);
+		}
 	}
 
 	public void saveProjectAs()
 	{
-		// TODO: prompt user and write the current project to disk in a different location
+		DialogUtil.saveFile("Open Project", PROJECT_FILE_FILTER).ifPresent(newFilename -> {
+			try
+			{
+				Files.writeString(Path.of(newFilename), GSON.toJson(this));
+				this.filename = newFilename;
+
+				config.recentProjects().add(new ProjectReference(new File(filename).getName(), filename));
+				saveConfig();
+			}
+			catch (Exception e)
+			{
+				DialogUtil.notify("Error", "Could not save project: " + e.getMessage(), DialogUtil.Icon.ERROR);
+			}
+		});
 	}
 
-	public List<ProjectReference> getRecentProjects()
+	private void saveConfig()
 	{
-		return List.of(
-				new ProjectReference("Study 2024A", null),
-				new ProjectReference("Study 2024B", null),
-				new ProjectReference("Study 2024C", null),
-				new ProjectReference("Study 2024D", null)
-		);
+		try
+		{
+			Files.writeString(Path.of(CONFIG_FILE), GSON.toJson(config));
+		}
+		catch (Exception e)
+		{
+			// Ignored
+		}
+	}
+
+	private void loadConfig()
+	{
+		try
+		{
+			config = GSON.fromJson(Files.readString(Path.of(filename)), Config.class);
+		}
+		catch (Exception e)
+		{
+			// Ignored
+		}
+
+		if (config == null)
+			config = new Config(new HashSet<>());
+	}
+
+	public Set<ProjectReference> getRecentProjects()
+	{
+		if (config.recentProjects() == null)
+			return Set.of();
+
+		return config.recentProjects();
 	}
 }

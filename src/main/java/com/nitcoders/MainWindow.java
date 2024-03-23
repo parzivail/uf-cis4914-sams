@@ -21,6 +21,7 @@ import java.nio.file.Path;
 
 public class MainWindow extends Application
 {
+	private static final String SAMS_TITLE = "Sample Administration and Management System (SAMS)";
 	private static ImFont smallFont;
 
 	private final ProjectManager projectManager;
@@ -33,7 +34,7 @@ public class MainWindow extends Application
 	@Override
 	protected void configure(Configuration config)
 	{
-		config.setTitle("Sample Administration and Management System (SAMS)");
+		config.setTitle(SAMS_TITLE);
 		getColorBg().set(0, 0, 0, 1);
 	}
 
@@ -105,7 +106,14 @@ public class MainWindow extends Application
 	private void drawMainWindow()
 	{
 		drawMenuBar();
-		drawTabs();
+
+		if (projectManager.getProject() == null)
+		{
+			ImGui.text(SAMS_TITLE);
+			ImGui.text("Open or create a project to get started!");
+		}
+		else
+			drawTabs();
 	}
 
 	private void drawTabs()
@@ -150,6 +158,9 @@ public class MainWindow extends Application
 		{
 			if (ImGui.beginMenu("File"))
 			{
+				if (ImGui.menuItem(IconFont.file_new + " New Project"))
+					projectManager.createProject();
+
 				if (ImGui.menuItem(IconFont.filebrowser + " Open Project"))
 					projectManager.openProject();
 

@@ -18,6 +18,7 @@ dependencies {
     implementation 'io.github.spair:imgui-java-natives-windows-ft:1.86.11'
 
     implementation 'org.apache.commons:commons-lang3:3.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
 
     implementation "org.lwjgl:lwjgl-tinyfd:3.1.2-SNAPSHOT"
     runtimeOnly group: "org.lwjgl", name: "lwjgl-tinyfd", version: "3.1.2-SNAPSHOT", classifier: "natives-windows"

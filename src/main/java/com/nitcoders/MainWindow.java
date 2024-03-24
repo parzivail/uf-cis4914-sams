@@ -164,9 +164,12 @@ public class MainWindow extends Application
 				if (ImGui.menuItem(IconFont.filebrowser + " Open Project"))
 					projectManager.openProject();
 
+				var recents = projectManager.getRecentProjects();
+
+				ImGui.beginDisabled(recents.isEmpty());
 				if (ImGui.beginMenu(IconFont.time + " Recent Projects"))
 				{
-					for (var recent : projectManager.getRecentProjects())
+					for (var recent : recents)
 					{
 						if (ImGui.menuItem(recent.name()))
 							projectManager.openProject(recent.filename());
@@ -174,6 +177,7 @@ public class MainWindow extends Application
 
 					ImGui.endMenu();
 				}
+				ImGui.endDisabled();
 
 				ImGui.separator();
 

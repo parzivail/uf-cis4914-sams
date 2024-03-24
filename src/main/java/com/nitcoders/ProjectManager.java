@@ -117,7 +117,7 @@ public class ProjectManager
 	{
 		try
 		{
-			config = GSON.fromJson(Files.readString(Path.of(filename)), Config.class);
+			config = GSON.fromJson(Files.readString(Path.of(CONFIG_FILE)), Config.class);
 		}
 		catch (Exception e)
 		{

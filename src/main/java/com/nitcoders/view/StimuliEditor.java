@@ -2,6 +2,7 @@ package com.nitcoders.view;
 
 import com.nitcoders.IconFont;
 import com.nitcoders.MainWindow;
+import com.nitcoders.ProjectManager;
 import com.nitcoders.model.Project;
 import com.nitcoders.model.Stimulus;
 import com.nitcoders.util.AudioUtil;
@@ -14,13 +15,15 @@ import imgui.flag.ImGuiTableFlags;
 import imgui.type.ImInt;
 import imgui.type.ImString;
 
+import java.nio.file.Path;
+
 public class StimuliEditor
 {
 	private static final ImInt selectedStimulusType = new ImInt();
 
 	private static Stimulus currentlyEditingStimulus = null;
 
-	public static void draw(Project project)
+	public static void draw(ProjectManager projectManager, Project project)
 	{
 		var innerSize = ImGui.getContentRegionAvail();
 		if (ImGui.beginTable("stimuliTable", 2, ImGuiTableFlags.Resizable | ImGuiTableFlags.NoHostExtendY, innerSize.x, innerSize.y))
@@ -114,7 +117,7 @@ public class StimuliEditor
 						ImGui.beginDisabled(soundFilename == null);
 						if (ImGui.button("%s##preview%s".formatted(IconFont.play_sound, i), frameSize, frameSize))
 						{
-							AudioUtil.tryPlay(soundFilename, AudioUtil.Channel.Both);
+							AudioUtil.tryPlay(projectManager.pathProjectRelativeToAbsolute(Path.of(stimulus.getSampleFilename())), AudioUtil.Channel.Both);
 						}
 						ImGui.endDisabled();
 
@@ -149,13 +152,13 @@ public class StimuliEditor
 
 			ImGui.tableNextColumn();
 
-			renderEditor(project, stimulusTypes);
+			renderEditor(projectManager, project, stimulusTypes);
 
 			ImGui.endTable();
 		}
 	}
 
-	private static void renderEditor(Project project, String[] stimulusTypes)
+	private static void renderEditor(ProjectManager projectManager, Project project, String[] stimulusTypes)
 	{
 		if (currentlyEditingStimulus == null)
 			return;
@@ -188,7 +191,7 @@ public class StimuliEditor
 			ImGuiHelper.filePicker(
 					"Choose File##stimulusSoundPicker",
 					currentlyEditingStimulus::getSampleFilename,
-					currentlyEditingStimulus::setSampleFilename,
+					sampleFilename -> currentlyEditingStimulus.setSampleFilename(projectManager.pathAbsoluteToProjectRelative(Path.of(sampleFilename)).toString()),
 					"Open Sound",
 					"WAV files (*.wav)",
 					"*.wav"

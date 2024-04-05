@@ -30,6 +30,21 @@ public class ProjectManager
 		loadConfig();
 	}
 
+	private Path getProjectPath()
+	{
+		return Path.of(filename).getParent();
+	}
+
+	public Path pathAbsoluteToProjectRelative(Path path)
+	{
+		return getProjectPath().relativize(path);
+	}
+
+	public Path pathProjectRelativeToAbsolute(Path path)
+	{
+		return getProjectPath().resolve(path);
+	}
+
 	public Project getProject()
 	{
 		return currentProject;

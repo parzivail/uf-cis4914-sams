@@ -3,6 +3,7 @@ package com.nitcoders.util;
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class AudioUtil
 {
@@ -95,11 +96,11 @@ public class AudioUtil
 		}
 	}
 
-	public static void tryPlay(String filename, Channel channel)
+	public static void tryPlay(Path filename, Channel channel)
 	{
 		try
 		{
-			playClip(new File(filename), channel);
+			playClip(filename.toFile(), channel);
 		}
 		catch (Exception e)
 		{

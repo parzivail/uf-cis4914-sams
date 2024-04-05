@@ -138,7 +138,7 @@ public class MainWindow extends Application
 
 			if (ImGui.beginTabItem("Stimuli"))
 			{
-				StimuliEditor.draw(projectManager.getProject());
+				StimuliEditor.draw(projectManager, projectManager.getProject());
 				ImGui.endTabItem();
 			}
 
@@ -150,7 +150,7 @@ public class MainWindow extends Application
 
 			if (ImGui.beginTabItem("Experiment Playlist"))
 			{
-				PlaylistEditor.draw(projectManager.getProject());
+				PlaylistEditor.draw(projectManager, projectManager.getProject());
 				ImGui.endTabItem();
 			}
 
@@ -161,6 +161,16 @@ public class MainWindow extends Application
 
 			if (ImGui.beginTabItem("Administer"))
 			{
+				ImGui.endTabItem();
+			}
+
+			if (ImGui.beginTabItem("Score"))
+			{
+				// TODO: score editor
+				// * per subject, show each stimulus in playlist order
+				// * each stimulus shows buttons for each word
+				// * click button to mark correct/incorrect
+				// * report is generated for all stimuli per subject
 				ImGui.endTabItem();
 			}
 

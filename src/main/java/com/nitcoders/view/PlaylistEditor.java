@@ -2,6 +2,7 @@ package com.nitcoders.view;
 
 import com.nitcoders.IconFont;
 import com.nitcoders.MainWindow;
+import com.nitcoders.ProjectManager;
 import com.nitcoders.model.PlaylistEntry;
 import com.nitcoders.model.Project;
 import com.nitcoders.util.AudioUtil;
@@ -12,6 +13,7 @@ import imgui.flag.ImGuiTableFlags;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 
+import java.nio.file.Path;
 import java.util.stream.Collectors;
 
 public class PlaylistEditor
@@ -20,7 +22,7 @@ public class PlaylistEditor
 	{
 	}
 
-	public static void draw(Project project)
+	public static void draw(ProjectManager projectManager, Project project)
 	{
 		var innerSize = ImGui.getContentRegionAvail();
 		if (ImGui.beginTable("entryTable", 2, ImGuiTableFlags.Resizable | ImGuiTableFlags.NoHostExtendY, innerSize.x, innerSize.y))
@@ -160,6 +162,17 @@ public class PlaylistEditor
 							}
 
 							ImGui.tableNextColumn();
+
+							final var soundFilename = stimulus.getSampleFilename();
+
+							ImGui.beginDisabled(soundFilename == null);
+							if (ImGui.button("%s##preview%s".formatted(IconFont.play_sound, i), frameSize, frameSize))
+							{
+								AudioUtil.tryPlay(projectManager.pathProjectRelativeToAbsolute(Path.of(stimulus.getSampleFilename())), entry.getChannel());
+							}
+							ImGui.endDisabled();
+
+							ImGui.sameLine();
 
 							ImGui.beginDisabled(i == 0);
 							if (ImGui.button("%s##moveUp%s".formatted(IconFont.tria_up, i), frameSize, frameSize))

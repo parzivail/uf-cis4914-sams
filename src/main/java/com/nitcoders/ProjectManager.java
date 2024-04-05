@@ -75,7 +75,7 @@ public class ProjectManager
 
 		try
 		{
-			Files.writeString(Path.of(filename), GSON.toJson(this));
+			Files.writeString(Path.of(filename), GSON.toJson(currentProject));
 		}
 		catch (Exception e)
 		{

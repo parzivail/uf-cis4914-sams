@@ -43,6 +43,7 @@ public class StimuliEditor
 				{
 					var stimuliType = stimulusTypes[selectedStimulusType.get()];
 					stimuli.add(0, currentlyEditingStimulus = new Stimulus("Sentence", stimuliType, null));
+					project.invalidateStimuliMap();
 				}
 
 				ImGui.pushFont(MainWindow.getSmallFont());
@@ -113,7 +114,7 @@ public class StimuliEditor
 						ImGui.beginDisabled(soundFilename == null);
 						if (ImGui.button("%s##preview%s".formatted(IconFont.play_sound, i), frameSize, frameSize))
 						{
-							AudioUtil.tryPlay(soundFilename);
+							AudioUtil.tryPlay(soundFilename, AudioUtil.Channel.Both);
 						}
 						ImGui.endDisabled();
 
@@ -134,7 +135,10 @@ public class StimuliEditor
 									false);
 
 							if (choice == DialogUtil.Button.YES)
+							{
 								iterator.remove();
+								project.invalidateStimuliMap();
+							}
 						}
 					});
 

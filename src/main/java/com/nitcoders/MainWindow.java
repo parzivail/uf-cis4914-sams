@@ -1,6 +1,7 @@
 package com.nitcoders;
 
 import com.nitcoders.util.IoUtil;
+import com.nitcoders.view.PlaylistEditor;
 import com.nitcoders.view.StimuliEditor;
 import com.nitcoders.view.StimulusTypesEditor;
 import com.nitcoders.view.SubjectsEditor;
@@ -29,6 +30,15 @@ public class MainWindow extends Application
 	public MainWindow()
 	{
 		projectManager = new ProjectManager();
+
+		/*
+			3 types
+				SO,CC,Other
+				~24 of each
+
+			12 of each kind assigned to both Vocoded-Only and Vocoded+LP signal type
+			2 groups of 36, grouped in each by the 3 types
+		 */
 	}
 
 	@Override
@@ -135,6 +145,12 @@ public class MainWindow extends Application
 			if (ImGui.beginTabItem("Subjects"))
 			{
 				SubjectsEditor.draw(projectManager.getProject());
+				ImGui.endTabItem();
+			}
+
+			if (ImGui.beginTabItem("Experiment Playlist"))
+			{
+				PlaylistEditor.draw(projectManager.getProject());
 				ImGui.endTabItem();
 			}
 

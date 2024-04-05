@@ -95,7 +95,7 @@ public class DialogUtil
 
 	public static void notify(String title, String message, Icon icon)
 	{
-		TinyFileDialogs.tinyfd_notifyPopup(title, message, icon.id());
+		notifyChoice(title, message, icon, ButtonGroup.OK, true);
 	}
 
 	public static Button notifyChoice(String title, String message, Icon icon, ButtonGroup group, boolean affirmativeDefault)

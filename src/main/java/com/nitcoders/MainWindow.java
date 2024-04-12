@@ -36,6 +36,26 @@ public class MainWindow extends Application
 
 			12 of each kind assigned to both Vocoded-Only and Vocoded+LP signal type
 			2 groups of 36, grouped in each by the 3 types
+
+			Subject data
+				Gender
+				Age
+
+			Allow samples to be tagged with "practice" samples
+			use as filter for practice/administer
+
+			Practice screen
+				Play normal
+				Play vocode
+				Play EAS
+
+			Tagging channels to give them experiment-specific names?
+				Left - Tactile
+				Right - Vocode
+				etc.
+
+			Scoring
+				- ?
 		 */
 	}
 

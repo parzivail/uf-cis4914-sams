@@ -39,11 +39,19 @@ public class AdministerView
 		var entry = playlist.get(currentEntry);
 		var stimulus = entry.getStimulus(project);
 
-		ImGui.text("Sentence %s of %s:".formatted(currentEntry + 1, playlistSize));
+		ImGui.text("Sentence %s of %s".formatted(currentEntry + 1, playlistSize));
 
 		ImGui.indent();
 		ImGui.pushFont(MainWindow.getLargeFont());
 		ImGui.text(stimulus.getSentence());
+
+		var channels = entry.getChannel();
+
+		ImGui.textDisabled("L %s   R %s".formatted(
+				channels != AudioUtil.Channel.Right ? IconFont.mute_ipo_on : IconFont.mute_ipo_off,
+				channels != AudioUtil.Channel.Left ? IconFont.mute_ipo_on : IconFont.mute_ipo_off
+		));
+
 		ImGui.popFont();
 		ImGui.unindent();
 

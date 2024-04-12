@@ -70,6 +70,7 @@ public class PlaylistEditor
 						if (ImGui.button("%s##add%s".formatted(IconFont.tria_right, i), frameSize, frameSize))
 						{
 							playlist.add(0, new PlaylistEntry(stimulus, AudioUtil.Channel.Both));
+							project.invalidatePlaylist();
 						}
 					});
 
@@ -179,6 +180,7 @@ public class PlaylistEditor
 							{
 								insertData.setValue(new InsertData(entry, i - 1));
 								iterator.remove();
+								project.invalidatePlaylist();
 							}
 							ImGui.endDisabled();
 
@@ -189,6 +191,7 @@ public class PlaylistEditor
 							{
 								insertData.setValue(new InsertData(entry, i + 1));
 								iterator.remove();
+								project.invalidatePlaylist();
 							}
 							ImGui.endDisabled();
 
@@ -197,6 +200,7 @@ public class PlaylistEditor
 							if (ImGui.button("%s##remove%s".formatted(IconFont.trash, i), frameSize, frameSize))
 							{
 								iterator.remove();
+								project.invalidatePlaylist();
 							}
 						});
 

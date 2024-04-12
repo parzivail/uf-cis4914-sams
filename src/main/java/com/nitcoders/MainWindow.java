@@ -1,10 +1,7 @@
 package com.nitcoders;
 
 import com.nitcoders.util.IoUtil;
-import com.nitcoders.view.PlaylistEditor;
-import com.nitcoders.view.StimuliEditor;
-import com.nitcoders.view.StimulusTypesEditor;
-import com.nitcoders.view.SubjectsEditor;
+import com.nitcoders.view.*;
 import imgui.ImFont;
 import imgui.ImFontConfig;
 import imgui.ImGui;
@@ -24,6 +21,7 @@ public class MainWindow extends Application
 {
 	private static final String SAMS_TITLE = "Sample Administration and Management System (SAMS)";
 	private static ImFont smallFont;
+	private static ImFont largeFont;
 
 	private final ProjectManager projectManager;
 
@@ -70,15 +68,18 @@ public class MainWindow extends Application
 		try
 		{
 			io.getFonts().addFontFromMemoryTTF(Files.readAllBytes(Path.of("C:\\Windows\\Fonts\\segoeui.ttf")), 20, fontConfig);
-
 			fontConfig.setMergeMode(true);
 			io.getFonts().addFontFromMemoryTTF(IoUtil.getBytes("fonts\\icons.ttf"), 20, fontConfig, IconFont.ICON_RANGE);
 
 			fontConfig.setMergeMode(false);
 			smallFont = io.getFonts().addFontFromMemoryTTF(Files.readAllBytes(Path.of("C:\\Windows\\Fonts\\segoeui.ttf")), 18, fontConfig);
-
 			fontConfig.setMergeMode(true);
 			io.getFonts().addFontFromMemoryTTF(IoUtil.getBytes("fonts\\icons.ttf"), 18, fontConfig, IconFont.ICON_RANGE);
+
+			fontConfig.setMergeMode(false);
+			largeFont = io.getFonts().addFontFromMemoryTTF(Files.readAllBytes(Path.of("C:\\Windows\\Fonts\\segoeui.ttf")), 48, fontConfig);
+			fontConfig.setMergeMode(true);
+			io.getFonts().addFontFromMemoryTTF(IoUtil.getBytes("fonts\\icons.ttf"), 48, fontConfig, IconFont.ICON_RANGE);
 
 			io.getFonts().build();
 		}
@@ -161,6 +162,7 @@ public class MainWindow extends Application
 
 			if (ImGui.beginTabItem("Administer"))
 			{
+				AdministerView.draw(projectManager, projectManager.getProject());
 				ImGui.endTabItem();
 			}
 
@@ -222,6 +224,11 @@ public class MainWindow extends Application
 	public static ImFont getSmallFont()
 	{
 		return smallFont;
+	}
+
+	public static ImFont getLargeFont()
+	{
+		return largeFont;
 	}
 
 	public static void main(String[] args)

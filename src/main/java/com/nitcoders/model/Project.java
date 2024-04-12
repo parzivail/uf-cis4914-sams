@@ -1,6 +1,7 @@
 package com.nitcoders.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -8,6 +9,7 @@ import java.util.stream.Collectors;
 public class Project
 {
 	private transient Map<String, Stimulus> stimuliMap = null;
+	private transient List<PlaylistEntry> bakedPlaylist = null;
 
 	private List<String> stimulusTypes = new ArrayList<>();
 	private List<Stimulus> stimuli = new ArrayList<>();
@@ -21,6 +23,11 @@ public class Project
 	public List<PlaylistEntry> getPlaylist()
 	{
 		return playlist;
+	}
+
+	public void invalidatePlaylist()
+	{
+		bakedPlaylist = null;
 	}
 
 	public List<Stimulus> getStimuli()
@@ -51,5 +58,13 @@ public class Project
 					.collect(Collectors.toMap(Stimulus::getId, o -> o));
 
 		return stimuliMap;
+	}
+
+	public List<PlaylistEntry> getBakedPlaylist()
+	{
+		if (bakedPlaylist == null)
+			bakedPlaylist = Collections.unmodifiableList(playlist);
+
+		return bakedPlaylist;
 	}
 }

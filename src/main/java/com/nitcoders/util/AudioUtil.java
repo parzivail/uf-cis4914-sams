@@ -7,25 +7,6 @@ import java.nio.file.Path;
 
 public class AudioUtil
 {
-	public enum Channel
-	{
-		Left("Left channel"),
-		Right("Right channel"),
-		Both("Both channels");
-
-		private final String name;
-
-		Channel(String name)
-		{
-			this.name = name;
-		}
-
-		public String getName()
-		{
-			return name;
-		}
-	}
-
 	static class AudioListener implements LineListener
 	{
 		private boolean done = false;
@@ -48,7 +29,7 @@ public class AudioUtil
 		}
 	}
 
-	private static void playClip(File clipFile, Channel channel) throws IOException, UnsupportedAudioFileException, LineUnavailableException, InterruptedException
+	private static void playClip(File clipFile, AudioChannel channel) throws IOException, UnsupportedAudioFileException, LineUnavailableException, InterruptedException
 	{
 		AudioListener listener = new AudioListener();
 		try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(clipFile))
@@ -89,7 +70,7 @@ public class AudioUtil
 		}
 	}
 
-	public static void tryPlay(Path filename, Channel channel)
+	public static void tryPlay(Path filename, AudioChannel channel)
 	{
 		try
 		{

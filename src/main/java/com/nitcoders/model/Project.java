@@ -1,6 +1,6 @@
 package com.nitcoders.model;
 
-import com.nitcoders.util.AudioUtil;
+import com.nitcoders.util.AudioChannel;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,20 +16,20 @@ public class Project
 	private List<Subject> subjects = new ArrayList<>();
 	private List<PlaylistEntry> playlist = new ArrayList<>();
 
-	private HashMap<AudioUtil.Channel, String> channelNames = new HashMap<>();
+	private HashMap<AudioChannel, String> channelNames = new HashMap<>();
 
 	public Project()
 	{
-		for (var channel : AudioUtil.Channel.values())
+		for (var channel : AudioChannel.values())
 			channelNames.put(channel, channel.getName());
 	}
 
-	public HashMap<AudioUtil.Channel, String> getChannelNameMap()
+	public HashMap<AudioChannel, String> getChannelNameMap()
 	{
 		return channelNames;
 	}
 
-	public String getChannelName(AudioUtil.Channel channel)
+	public String getChannelName(AudioChannel channel)
 	{
 		return channelNames.get(channel);
 	}
@@ -94,7 +94,7 @@ public class Project
 				if (!stimulus.isPractice())
 					continue;
 
-				for (var channel : AudioUtil.Channel.values())
+				for (var channel : AudioChannel.values())
 					bakedPracticePlaylist.add(new PlaylistEntry(stimulus, channel));
 			}
 		}

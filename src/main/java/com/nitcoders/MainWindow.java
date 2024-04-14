@@ -34,13 +34,6 @@ public class MainWindow extends Application
 				SO,CC,Other
 				~24 of each
 
-			12 of each kind assigned to both Vocoded-Only and Vocoded+LP signal type
-			2 groups of 36, grouped in each by the 3 types
-
-			Subject data
-				Gender
-				Age
-
 			Scoring
 				- ?
 		 */

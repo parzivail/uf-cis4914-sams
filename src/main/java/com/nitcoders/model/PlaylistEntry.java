@@ -1,13 +1,13 @@
 package com.nitcoders.model;
 
-import com.nitcoders.util.AudioUtil;
+import com.nitcoders.util.AudioChannel;
 
 public class PlaylistEntry
 {
 	private String stimulusId;
-	private AudioUtil.Channel channel;
+	private AudioChannel channel;
 
-	public PlaylistEntry(Stimulus stimulus, AudioUtil.Channel channel)
+	public PlaylistEntry(Stimulus stimulus, AudioChannel channel)
 	{
 		this.stimulusId = stimulus.getId();
 		this.channel = channel;
@@ -28,12 +28,12 @@ public class PlaylistEntry
 		return project.getStimuliMap().get(stimulusId);
 	}
 
-	public AudioUtil.Channel getChannel()
+	public AudioChannel getChannel()
 	{
 		return channel;
 	}
 
-	public void setChannel(AudioUtil.Channel channel)
+	public void setChannel(AudioChannel channel)
 	{
 		this.channel = channel;
 	}

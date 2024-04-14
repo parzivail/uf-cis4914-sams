@@ -1,7 +1,7 @@
 package com.nitcoders.view;
 
 import com.nitcoders.model.Project;
-import com.nitcoders.util.AudioUtil;
+import com.nitcoders.util.AudioChannel;
 import imgui.ImGui;
 import imgui.flag.ImGuiTableColumnFlags;
 import imgui.type.ImString;
@@ -17,15 +17,15 @@ public class ChannelEditor
 			ImGui.tableSetupColumn("label", ImGuiTableColumnFlags.WidthFixed, 100);
 			ImGui.tableSetupColumn("field", ImGuiTableColumnFlags.WidthStretch);
 
-			drawChannelEditor(project, AudioUtil.Channel.Left);
-			drawChannelEditor(project, AudioUtil.Channel.Right);
-			drawChannelEditor(project, AudioUtil.Channel.Both);
+			drawChannelEditor(project, AudioChannel.Left);
+			drawChannelEditor(project, AudioChannel.Right);
+			drawChannelEditor(project, AudioChannel.Both);
 
 			ImGui.endTable();
 		}
 	}
 
-	private static void drawChannelEditor(Project project, AudioUtil.Channel channel)
+	private static void drawChannelEditor(Project project, AudioChannel channel)
 	{
 		ImGui.tableNextColumn();
 		ImGui.text(channel.getName());

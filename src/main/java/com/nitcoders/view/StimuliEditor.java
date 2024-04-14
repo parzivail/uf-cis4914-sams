@@ -5,10 +5,7 @@ import com.nitcoders.MainWindow;
 import com.nitcoders.ProjectManager;
 import com.nitcoders.model.Project;
 import com.nitcoders.model.Stimulus;
-import com.nitcoders.util.AudioUtil;
-import com.nitcoders.util.DialogUtil;
-import com.nitcoders.util.ImGuiHelper;
-import com.nitcoders.util.ListUtil;
+import com.nitcoders.util.*;
 import imgui.ImGui;
 import imgui.flag.ImGuiTableColumnFlags;
 import imgui.flag.ImGuiTableFlags;
@@ -124,7 +121,7 @@ public class StimuliEditor
 						ImGui.beginDisabled(soundFilename == null);
 						if (ImGui.button("%s##preview%s".formatted(IconFont.play_sound, i), frameSize, frameSize))
 						{
-							AudioUtil.tryPlay(projectManager.pathProjectRelativeToAbsolute(Path.of(stimulus.getSampleFilename())), AudioUtil.Channel.Both);
+							AudioUtil.tryPlay(projectManager.pathProjectRelativeToAbsolute(Path.of(stimulus.getSampleFilename())), AudioChannel.Both);
 						}
 						ImGui.endDisabled();
 

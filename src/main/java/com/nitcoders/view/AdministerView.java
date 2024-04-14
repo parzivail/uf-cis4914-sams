@@ -5,6 +5,7 @@ import com.nitcoders.MainWindow;
 import com.nitcoders.ProjectManager;
 import com.nitcoders.model.PlaylistEntry;
 import com.nitcoders.model.Project;
+import com.nitcoders.util.AudioChannel;
 import com.nitcoders.util.AudioUtil;
 import imgui.ImGui;
 import imgui.type.ImBoolean;
@@ -46,10 +47,10 @@ public class AdministerView
 		var channels = entry.getChannel();
 
 		ImGui.textDisabled("%s %s   %s %s".formatted(
-				project.getChannelName(AudioUtil.Channel.Left),
-				channels != AudioUtil.Channel.Right ? IconFont.mute_ipo_on : IconFont.mute_ipo_off,
-				project.getChannelName(AudioUtil.Channel.Right),
-				channels != AudioUtil.Channel.Left ? IconFont.mute_ipo_on : IconFont.mute_ipo_off
+				project.getChannelName(AudioChannel.Left),
+				channels != AudioChannel.Right ? IconFont.mute_ipo_on : IconFont.mute_ipo_off,
+				project.getChannelName(AudioChannel.Right),
+				channels != AudioChannel.Left ? IconFont.mute_ipo_on : IconFont.mute_ipo_off
 		));
 
 		ImGui.popFont();

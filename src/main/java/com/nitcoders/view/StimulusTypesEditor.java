@@ -54,7 +54,6 @@ public class StimulusTypesEditor
 
 						if (ImGui.button("%s##delete%s".formatted(IconFont.trash, i), frameSize, frameSize))
 						{
-							// TODO: ask first
 							var choice = DialogUtil.notifyChoice(
 									"Delete stimuli type",
 									"Are you sure you want to delete this stimulus type? This will also delete all stimuli of this type.",
@@ -76,8 +75,6 @@ public class StimulusTypesEditor
 			}
 
 			ImGui.tableNextColumn();
-
-			// TODO: right margin stuff
 
 			ImGui.endTable();
 		}

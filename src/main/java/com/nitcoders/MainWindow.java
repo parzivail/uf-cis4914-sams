@@ -33,9 +33,6 @@ public class MainWindow extends Application
 			3 types
 				SO,CC,Other
 				~24 of each
-
-			Scoring
-				- ?
 		 */
 	}
 

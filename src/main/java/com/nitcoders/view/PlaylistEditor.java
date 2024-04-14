@@ -57,7 +57,7 @@ public class PlaylistEditor
 
 					ListUtil.iterate(stimuli, (iterator, i, stimulus) ->
 					{
-						if (includedIds.contains(stimulus.getId()))
+						if (stimulus.isPractice() || includedIds.contains(stimulus.getId()))
 							return;
 
 						ImGui.tableNextColumn();
@@ -96,7 +96,7 @@ public class PlaylistEditor
 					for (var channel : channels)
 					{
 						ImGui.tableNextColumn();
-						ImGui.text(channel.getAbbreviation());
+						ImGui.text(project.getChannelName(channel));
 					}
 
 					for (var type : stimulusTypes)
@@ -156,7 +156,7 @@ public class PlaylistEditor
 
 							for (var channel : channels)
 							{
-								if (ImGui.radioButton("%s##%s".formatted(channel.getAbbreviation(), i), entry.getChannel() == channel))
+								if (ImGui.radioButton("%s##%s".formatted(project.getChannelName(channel), i), entry.getChannel() == channel))
 									entry.setChannel(channel);
 
 								ImGui.sameLine();

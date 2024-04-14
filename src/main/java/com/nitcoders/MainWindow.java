@@ -151,6 +151,12 @@ public class MainWindow extends Application
 	{
 		if (ImGui.beginTabBar("featureTabs"))
 		{
+			if (ImGui.beginTabItem("Audio Channels"))
+			{
+				ChannelEditor.draw(projectManager.getProject());
+				ImGui.endTabItem();
+			}
+
 			if (ImGui.beginTabItem("Stimulus Types"))
 			{
 				StimulusTypesEditor.draw(projectManager.getProject());
@@ -177,12 +183,13 @@ public class MainWindow extends Application
 
 			if (ImGui.beginTabItem("Practice"))
 			{
+				AdministerView.draw(projectManager, projectManager.getProject(), projectManager.getProject().getBakedPracticePlaylist());
 				ImGui.endTabItem();
 			}
 
 			if (ImGui.beginTabItem("Administer"))
 			{
-				AdministerView.draw(projectManager, projectManager.getProject());
+				AdministerView.draw(projectManager, projectManager.getProject(), projectManager.getProject().getBakedPlaylist());
 				ImGui.endTabItem();
 			}
 

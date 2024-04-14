@@ -12,6 +12,7 @@ import com.nitcoders.util.ListUtil;
 import imgui.ImGui;
 import imgui.flag.ImGuiTableColumnFlags;
 import imgui.flag.ImGuiTableFlags;
+import imgui.type.ImBoolean;
 import imgui.type.ImInt;
 import imgui.type.ImString;
 
@@ -45,7 +46,7 @@ public class StimuliEditor
 				if (ImGui.button("New Stimulus", -1, frameSize))
 				{
 					var stimuliType = stimulusTypes[selectedStimulusType.get()];
-					stimuli.add(0, currentlyEditingStimulus = new Stimulus("Sentence", stimuliType, null));
+					stimuli.add(0, currentlyEditingStimulus = new Stimulus("Sentence", stimuliType, null, false));
 					project.invalidateStimuliMap();
 				}
 
@@ -98,6 +99,12 @@ public class StimuliEditor
 						ImGui.pushFont(MainWindow.getSmallFont());
 						ImGui.indent();
 						ImGui.text(stimulus.getStimulusType());
+
+						if (stimulus.isPractice())
+						{
+							ImGui.sameLine();
+							ImGui.textDisabled("(Practice only)");
+						}
 
 						if (stimulus.getSampleFilename() == null)
 							ImGui.textDisabled("No audio file selected");
@@ -183,6 +190,18 @@ public class StimuliEditor
 			var sentenceStr = new ImString(currentlyEditingStimulus.getSentence(), 512);
 			if (ImGui.inputText("##stimulusSentence", sentenceStr))
 				currentlyEditingStimulus.setSentence(sentenceStr.get());
+
+			ImGui.tableNextColumn();
+
+			ImGui.text("Practice Only");
+
+			ImGui.tableNextColumn();
+			var isPractice = new ImBoolean(currentlyEditingStimulus.isPractice());
+			if (ImGui.checkbox("##practiceOnly", isPractice))
+			{
+				currentlyEditingStimulus.setPractice(isPractice.get());
+				project.invalidatePlaylist();
+			}
 
 			ImGui.tableNextColumn();
 			ImGui.text("Audio Sample");

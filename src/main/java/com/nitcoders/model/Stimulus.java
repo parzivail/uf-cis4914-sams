@@ -9,13 +9,15 @@ public class Stimulus
 	private String sentence;
 	private String stimulusType;
 	private String sampleFilename;
+	private boolean isPractice;
 
-	public Stimulus(String sentence, String stimulusType, String sampleFilename)
+	public Stimulus(String sentence, String stimulusType, String sampleFilename, boolean isPractice)
 	{
 		this.id = UUID.randomUUID().toString();
 		this.sentence = sentence;
 		this.stimulusType = stimulusType;
 		this.sampleFilename = sampleFilename;
+		this.isPractice = isPractice;
 	}
 
 	public String getId()
@@ -51,5 +53,15 @@ public class Stimulus
 	public void setSampleFilename(String sampleFilename)
 	{
 		this.sampleFilename = sampleFilename;
+	}
+
+	public boolean isPractice()
+	{
+		return isPractice;
+	}
+
+	public void setPractice(boolean practice)
+	{
+		isPractice = practice;
 	}
 }

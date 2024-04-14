@@ -19,10 +19,8 @@ public class AdministerView
 
 	private static final ImBoolean autoAdvance = new ImBoolean(true);
 
-	public static void draw(ProjectManager projectManager, Project project)
+	public static void draw(ProjectManager projectManager, Project project, List<PlaylistEntry> playlist)
 	{
-		var playlist = project.getBakedPlaylist();
-
 		if (playlist.isEmpty())
 		{
 			ImGui.textDisabled("Playlist is empty.");
@@ -47,8 +45,10 @@ public class AdministerView
 
 		var channels = entry.getChannel();
 
-		ImGui.textDisabled("L %s   R %s".formatted(
+		ImGui.textDisabled("%s %s   %s %s".formatted(
+				project.getChannelName(AudioUtil.Channel.Left),
 				channels != AudioUtil.Channel.Right ? IconFont.mute_ipo_on : IconFont.mute_ipo_off,
+				project.getChannelName(AudioUtil.Channel.Right),
 				channels != AudioUtil.Channel.Left ? IconFont.mute_ipo_on : IconFont.mute_ipo_off
 		));
 

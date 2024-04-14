@@ -9,22 +9,15 @@ public class AudioUtil
 {
 	public enum Channel
 	{
-		Left("Left", "Left channel"),
-		Right("Right", "Right channel"),
-		Both("Left + Right", "Both channels");
+		Left("Left channel"),
+		Right("Right channel"),
+		Both("Both channels");
 
-		private String abbreviation;
-		private String name;
+		private final String name;
 
-		Channel(String abbreviation, String name)
+		Channel(String name)
 		{
-			this.abbreviation = abbreviation;
 			this.name = name;
-		}
-
-		public String getAbbreviation()
-		{
-			return abbreviation;
 		}
 
 		public String getName()

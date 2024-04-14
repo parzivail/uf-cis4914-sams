@@ -2,15 +2,33 @@ package com.nitcoders.model;
 
 public class Subject
 {
-	private String id;
-	private String firstName;
-	private String lastName;
+	public enum Gender
+	{
+		Male("Male"),
+		Female("Female");
 
-	public Subject(String id, String firstName, String lastName)
+		private final String name;
+
+		Gender(String name)
+		{
+			this.name = name;
+		}
+
+		public String getName()
+		{
+			return name;
+		}
+	}
+
+	private String id;
+	private int age;
+	private Gender gender;
+
+	public Subject(String id, int age, Gender gender)
 	{
 		this.id = id;
-		this.firstName = firstName;
-		this.lastName = lastName;
+		this.age = age;
+		this.gender = gender;
 	}
 
 	public String getId()
@@ -23,23 +41,23 @@ public class Subject
 		this.id = id;
 	}
 
-	public String getFirstName()
+	public Gender getGender()
 	{
-		return firstName;
+		return gender;
 	}
 
-	public void setFirstName(String firstName)
+	public void setGender(Gender gender)
 	{
-		this.firstName = firstName;
+		this.gender = gender;
 	}
 
-	public String getLastName()
+	public int getAge()
 	{
-		return lastName;
+		return age;
 	}
 
-	public void setLastName(String lastName)
+	public void setAge(int age)
 	{
-		this.lastName = lastName;
+		this.age = age;
 	}
 }

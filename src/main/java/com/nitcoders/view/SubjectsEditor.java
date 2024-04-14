@@ -9,10 +9,18 @@ import com.nitcoders.util.ListUtil;
 import imgui.ImGui;
 import imgui.flag.ImGuiTableColumnFlags;
 import imgui.flag.ImGuiTableFlags;
+import imgui.type.ImInt;
 import imgui.type.ImString;
+
+import java.util.Arrays;
 
 public class SubjectsEditor
 {
+	private static final Subject.Gender[] genders = Subject.Gender.values();
+	private static final String[] genderNames = Arrays.stream(Subject.Gender.values()).map(Subject.Gender::getName).toArray(String[]::new);
+
+	private static final ImInt nextSubjectAge = new ImInt(25);
+	private static final ImInt nextSubjectGender = new ImInt(0);
 	private static final ImString nextSubjectId = new ImString(512);
 
 	private static Subject currentlyEditingSubject = null;
@@ -33,13 +41,25 @@ public class SubjectsEditor
 
 			var idExists = subjects.stream().anyMatch(subject -> subject.getId().equals(nextSubjectId.get()));
 
+			var columnWidth = ImGui.getContentRegionAvailX();
+
+			ImGui.setNextItemWidth(columnWidth * 0.3f);
 			ImGui.inputTextWithHint("##subjectId", "ID", nextSubjectId);
 			ImGui.sameLine();
 
+			ImGui.setNextItemWidth(columnWidth * 0.2f);
+			ImGui.inputInt("##subjectAge", nextSubjectAge);
+			ImGui.sameLine();
+
+			ImGui.setNextItemWidth(columnWidth * 0.25f);
+			ImGui.combo("##subjectGender", nextSubjectGender, genderNames);
+			ImGui.sameLine();
+
+			ImGui.setNextItemWidth(columnWidth * 0.25f);
 			ImGui.beginDisabled(idExists || nextSubjectId.isEmpty());
 			if (ImGui.button("Add Subject", -1, frameSize))
 			{
-				subjects.add(0, currentlyEditingSubject = new Subject(nextSubjectId.get(), "First", "Last"));
+				subjects.add(0, currentlyEditingSubject = new Subject(nextSubjectId.get(), nextSubjectAge.get(), genders[nextSubjectGender.get()]));
 
 				try
 				{
@@ -77,8 +97,7 @@ public class SubjectsEditor
 
 						ImGui.pushFont(MainWindow.getSmallFont());
 						ImGui.indent();
-						ImGui.text(subject.getFirstName());
-						ImGui.text(subject.getLastName());
+						ImGui.text("%sy %s".formatted(subject.getAge(), subject.getGender().getName()));
 
 						ImGui.unindent();
 						ImGui.popFont();
@@ -136,20 +155,27 @@ public class SubjectsEditor
 			ImGui.textDisabled(currentlyEditingSubject.getId());
 
 			ImGui.tableNextColumn();
-			ImGui.text("First Name");
+			ImGui.text("Age");
 			ImGui.tableNextColumn();
 
-			var firstName = new ImString(currentlyEditingSubject.getFirstName(), 512);
-			if (ImGui.inputText("##subjectFirstName", firstName))
-				currentlyEditingSubject.setFirstName(firstName.get());
+			var age = new ImInt(currentlyEditingSubject.getAge());
+			if (ImGui.inputInt("##subjectAge", age))
+				currentlyEditingSubject.setAge(age.get());
 
 			ImGui.tableNextColumn();
-			ImGui.text("Last Name");
+			ImGui.text("Gender");
 			ImGui.tableNextColumn();
 
-			var lastName = new ImString(currentlyEditingSubject.getLastName(), 512);
-			if (ImGui.inputText("##subjectLastName", lastName))
-				currentlyEditingSubject.setLastName(lastName.get());
+			if (ImGui.beginCombo("##subjectGender", currentlyEditingSubject.getGender().getName()))
+			{
+				for (var gender : genders)
+				{
+					if (ImGui.selectable(gender.getName()))
+						currentlyEditingSubject.setGender(gender);
+				}
+
+				ImGui.endCombo();
+			}
 
 			ImGui.endTable();
 		}

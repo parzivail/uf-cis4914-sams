@@ -41,19 +41,6 @@ public class MainWindow extends Application
 				Gender
 				Age
 
-			Allow samples to be tagged with "practice" samples
-			use as filter for practice/administer
-
-			Practice screen
-				Play normal
-				Play vocode
-				Play EAS
-
-			Tagging channels to give them experiment-specific names?
-				Left - Tactile
-				Right - Vocode
-				etc.
-
 			Scoring
 				- ?
 		 */

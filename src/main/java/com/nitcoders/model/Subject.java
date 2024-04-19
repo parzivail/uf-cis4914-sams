@@ -1,5 +1,7 @@
 package com.nitcoders.model;
 
+import java.util.HashMap;
+
 public class Subject
 {
 	public enum Gender
@@ -23,12 +25,14 @@ public class Subject
 	private String id;
 	private int age;
 	private Gender gender;
+	private HashMap<String, boolean[]> scores;
 
 	public Subject(String id, int age, Gender gender)
 	{
 		this.id = id;
 		this.age = age;
 		this.gender = gender;
+		this.scores = new HashMap<>();
 	}
 
 	public String getId()
@@ -59,5 +63,10 @@ public class Subject
 	public void setAge(int age)
 	{
 		this.age = age;
+	}
+
+	public HashMap<String, boolean[]> getScores()
+	{
+		return scores;
 	}
 }

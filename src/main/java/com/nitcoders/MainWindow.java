@@ -1,5 +1,6 @@
 package com.nitcoders;
 
+import com.nitcoders.util.DialogUtil;
 import com.nitcoders.util.IoUtil;
 import com.nitcoders.view.*;
 import imgui.ImFont;
@@ -115,7 +116,7 @@ public class MainWindow extends Application
 	{
 		drawMenuBar();
 
-		if (projectManager.getProject() == null)
+		if (!projectManager.hasOpenProject())
 		{
 			ImGui.text(SAMS_TITLE);
 			ImGui.text("Open or create a project to get started!");
@@ -172,11 +173,8 @@ public class MainWindow extends Application
 
 			if (ImGui.beginTabItem("Score"))
 			{
-				// TODO: score editor
-				// * per subject, show each stimulus in playlist order
-				// * each stimulus shows buttons for each word
-				// * click button to mark correct/incorrect
-				// * report is generated for all stimuli per subject
+				// TODO: report for all stimuli per subject
+				ScoreView.draw(projectManager.getProject());
 				ImGui.endTabItem();
 			}
 
@@ -191,10 +189,30 @@ public class MainWindow extends Application
 			if (ImGui.beginMenu("File"))
 			{
 				if (ImGui.menuItem(IconFont.file_new + " New Project"))
-					projectManager.createProject();
+				{
+					var result = projectManager.hasOpenProject() ? DialogUtil.notifyChoice(
+							"Are you sure?",
+							"Are you sure you want to create a new project? Any unsaved changes in your current project will be lost.",
+							DialogUtil.Icon.WARNING,
+							DialogUtil.ButtonGroup.YESNO,
+							false
+					) : DialogUtil.Button.YES;
+					if (result == DialogUtil.Button.YES)
+						projectManager.createProject();
+				}
 
 				if (ImGui.menuItem(IconFont.filebrowser + " Open Project"))
-					projectManager.openProject();
+				{
+					var result = projectManager.hasOpenProject() ? DialogUtil.notifyChoice(
+							"Are you sure?",
+							"Are you sure you want to open another project? Any unsaved changes in your current project will be lost.",
+							DialogUtil.Icon.WARNING,
+							DialogUtil.ButtonGroup.YESNO,
+							false
+					) : DialogUtil.Button.YES;
+					if (result == DialogUtil.Button.YES)
+						projectManager.openProject();
+				}
 
 				var recents = projectManager.getRecentProjects();
 
@@ -204,7 +222,17 @@ public class MainWindow extends Application
 					for (var recent : recents)
 					{
 						if (ImGui.menuItem(recent.name()))
-							projectManager.openProject(recent.filename());
+						{
+							var result = projectManager.hasOpenProject() ? DialogUtil.notifyChoice(
+									"Are you sure?",
+									"Are you sure you want to create a new project? Any unsaved changes in your current project will be lost.",
+									DialogUtil.Icon.WARNING,
+									DialogUtil.ButtonGroup.YESNO,
+									false
+							) : DialogUtil.Button.YES;
+							if (result == DialogUtil.Button.YES)
+								projectManager.openProject(recent.filename());
+						}
 					}
 
 					ImGui.endMenu();

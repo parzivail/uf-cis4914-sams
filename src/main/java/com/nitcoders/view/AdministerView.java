@@ -24,7 +24,7 @@ public class AdministerView
 	{
 		if (playlist.isEmpty())
 		{
-			ImGui.textDisabled("Playlist is empty.");
+			ImGui.textDisabled("Playlist is empty. Nothing to play.");
 			return;
 		}
 
@@ -42,7 +42,7 @@ public class AdministerView
 
 		ImGui.indent();
 		ImGui.pushFont(MainWindow.getLargeFont());
-		ImGui.text(stimulus.getSentence());
+		ImGui.textWrapped(stimulus.getSentence());
 
 		var channels = entry.getChannel();
 
@@ -106,7 +106,7 @@ public class AdministerView
 		{
 			for (var i = 0; i < playlistSize; i++)
 			{
-				if (ImGui.selectable("%s(%s) %s".formatted(i == currentEntry ? IconFont.rightarrow : "", i + 1, playlist.get(i).getStimulus(project).getSentence())))
+				if (ImGui.selectable("(%s) %s".formatted(i + 1, playlist.get(i).getStimulus(project).getSentence()), i == currentEntry))
 					currentEntry = i;
 			}
 			ImGui.endListBox();

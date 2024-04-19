@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 public class Project
 {
 	private transient Map<String, Stimulus> stimuliMap = null;
+	private transient Map<String, Subject> subjectMap = null;
 	private transient List<PlaylistEntry> bakedPlaylist = null;
 	private transient List<PlaylistEntry> bakedPracticePlaylist = null;
 
@@ -73,6 +74,21 @@ public class Project
 					.collect(Collectors.toMap(Stimulus::getId, o -> o));
 
 		return stimuliMap;
+	}
+
+	public void invalidateSubjectMap()
+	{
+		subjectMap = null;
+	}
+
+	public Map<String, Subject> getSubjectMap()
+	{
+		if (subjectMap == null)
+			subjectMap = subjects
+					.stream()
+					.collect(Collectors.toMap(Subject::getId, o -> o));
+
+		return subjectMap;
 	}
 
 	public List<PlaylistEntry> getBakedPlaylist()

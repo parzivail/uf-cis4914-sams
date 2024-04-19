@@ -73,6 +73,8 @@ public class SubjectsEditor
 					// If the ID isn't numeric, just clear the field
 					nextSubjectId.clear();
 				}
+
+				project.invalidateSubjectMap();
 			}
 			ImGui.endDisabled();
 

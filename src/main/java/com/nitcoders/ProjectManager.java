@@ -150,4 +150,9 @@ public class ProjectManager
 
 		return config.recentProjects();
 	}
+
+	public boolean hasOpenProject()
+	{
+		return currentProject != null;
+	}
 }

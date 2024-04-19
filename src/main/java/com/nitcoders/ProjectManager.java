@@ -30,7 +30,7 @@ public class ProjectManager
 		loadConfig();
 	}
 
-	private Path getProjectPath()
+	Path getProjectPath()
 	{
 		return Path.of(filename).getParent();
 	}

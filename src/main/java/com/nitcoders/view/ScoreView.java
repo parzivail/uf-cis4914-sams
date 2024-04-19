@@ -44,9 +44,18 @@ public class ScoreView
 		if (!subjectMap.containsKey(currentUserId))
 			currentUserId = null;
 
-		var subjectPreviewStr = currentUserId;
-		if (subjectPreviewStr == null)
-			subjectPreviewStr = "Select a subject";
+		var currentSubject = subjectMap.get(currentUserId);
+
+		var subjectPreviewStr = "Select a subject";
+		if (currentSubject != null)
+		{
+			var scoredCount = playlist.stream()
+			                          .filter(e -> currentSubject.getScores().containsKey(e.getStimulus(project).getSentence()))
+			                          .count();
+			var isComplete = scoredCount == playlistSize;
+
+			subjectPreviewStr = "%s%s (%s/%s)".formatted(isComplete ? IconFont.checkmark + " " : "", currentSubject.getId(), scoredCount, playlistSize);
+		}
 
 		ImGui.text("Subject:");
 
@@ -54,19 +63,22 @@ public class ScoreView
 		{
 			for (var subject : project.getSubjects())
 			{
-				if (ImGui.selectable(subject.getId()))
+				var scoredCount = playlist.stream()
+				                          .filter(e -> subject.getScores().containsKey(e.getStimulus(project).getSentence()))
+				                          .count();
+				var isComplete = scoredCount == playlistSize;
+
+				if (ImGui.selectable("%s%s (%s/%s)".formatted(isComplete ? IconFont.checkmark + " " : "", subject.getId(), scoredCount, playlistSize)))
 					currentUserId = subject.getId();
 			}
 			ImGui.endCombo();
 		}
 
-		if (currentUserId == null)
+		if (currentSubject == null)
 		{
 			ImGui.textDisabled("No subject selected.");
 			return;
 		}
-
-		var currentSubject = subjectMap.get(currentUserId);
 
 		ImGui.text("Sentence %s of %s".formatted(currentEntry + 1, playlistSize));
 
@@ -113,7 +125,7 @@ public class ScoreView
 		ImGui.spacing();
 		ImGui.spacing();
 
-		if (ImGui.button("All correct"))
+		if (ImGui.button("Mark all correct"))
 		{
 			Arrays.fill(currentScore, true);
 			currentSubject.getScores().put(stimulus.getSentence(), currentScore);
@@ -121,11 +133,20 @@ public class ScoreView
 
 		ImGui.sameLine();
 
-		if (ImGui.button("All incorrect"))
+		if (ImGui.button("Mark all incorrect"))
 		{
 			Arrays.fill(currentScore, false);
 			currentSubject.getScores().put(stimulus.getSentence(), currentScore);
 		}
+
+		ImGui.sameLine();
+
+		ImGui.beginDisabled(!currentSubject.getScores().containsKey(stimulus.getSentence()));
+		if (ImGui.button("Mark unscored"))
+		{
+			currentSubject.getScores().remove(stimulus.getSentence());
+		}
+		ImGui.endDisabled();
 
 		ImGui.unindent();
 

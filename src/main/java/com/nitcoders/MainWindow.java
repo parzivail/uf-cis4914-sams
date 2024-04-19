@@ -241,14 +241,30 @@ public class MainWindow extends Application
 
 				ImGui.separator();
 
+				ImGui.beginDisabled(!projectManager.hasOpenProject());
 				if (ImGui.menuItem(IconFont.import_file + " Save Project"))
 					projectManager.saveProject();
 
 				if (ImGui.menuItem(IconFont.current_file + " Save Project As..."))
 					projectManager.saveProjectAs();
+				ImGui.endDisabled();
 
 				ImGui.endMenu();
 			}
+
+			if (ImGui.beginMenu("Scores"))
+			{
+				ImGui.beginDisabled(!projectManager.hasOpenProject());
+				if (ImGui.menuItem(IconFont.export + " Export as CSV"))
+				{
+					DialogUtil.openFolder("Destination directory", projectManager.getProjectPath().toAbsolutePath().toString())
+					          .ifPresent(s -> projectManager.getProject().exportScores(s));
+				}
+				ImGui.endDisabled();
+
+				ImGui.endMenu();
+			}
+
 			ImGui.endMenuBar();
 		}
 	}

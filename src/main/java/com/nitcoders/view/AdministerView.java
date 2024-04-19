@@ -106,7 +106,8 @@ public class AdministerView
 		{
 			for (var i = 0; i < playlistSize; i++)
 			{
-				if (ImGui.selectable("(%s) %s".formatted(i + 1, playlist.get(i).getStimulus(project).getSentence()), i == currentEntry))
+				var queueEntry = playlist.get(i);
+				if (ImGui.selectable("(%s) %s (%s)".formatted(i + 1, queueEntry.getStimulus(project).getSentence(), project.getChannelName(queueEntry.getChannel())), i == currentEntry))
 					currentEntry = i;
 			}
 			ImGui.endListBox();

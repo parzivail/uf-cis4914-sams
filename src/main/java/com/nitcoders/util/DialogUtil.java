@@ -64,6 +64,14 @@ public class DialogUtil
 		}
 	}
 
+	public static Optional<String> openFolder(String title, String defaultPath)
+	{
+		var result = TinyFileDialogs.tinyfd_selectFolderDialog(title, defaultPath);
+		if (result == null)
+			return Optional.empty();
+		return Optional.of(result);
+	}
+
 	public static Optional<String[]> openFile(String title, String singleFilterName, boolean allowMultiple, String... filters)
 	{
 		try (MemoryStack stack = MemoryStack.stackPush())

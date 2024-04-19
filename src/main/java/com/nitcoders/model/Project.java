@@ -1,7 +1,10 @@
 package com.nitcoders.model;
 
 import com.nitcoders.util.AudioChannel;
+import com.nitcoders.util.DialogUtil;
 
+import java.io.PrintWriter;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -116,5 +119,39 @@ public class Project
 		}
 
 		return bakedPracticePlaylist;
+	}
+
+	public void exportScores(String path)
+	{
+		var folder = Path.of(path);
+
+		for (var subject : subjects)
+		{
+			var filename = folder.resolve("%s.csv".formatted(subject.getId()));
+			try (var sw = new PrintWriter(filename.toFile()))
+			{
+				sw.println("Sentence,1st word correct,2nd word correct,...,Nth word correct");
+
+				subject.getScores().keySet().stream().sorted().forEachOrdered(sentence -> {
+					sw.print('"');
+					sw.print(sentence);
+					sw.print('"');
+
+					var parts = subject.getScores().get(sentence);
+					for (var part : parts)
+					{
+						sw.print(",");
+						sw.print(part);
+					}
+
+					sw.println();
+				});
+			}
+			catch (Exception e)
+			{
+				DialogUtil.notify("Unable to save scores", "Unable to save scores! Error while saving %s: %s".formatted(filename.toString(), e.getMessage()), DialogUtil.Icon.ERROR);
+				break;
+			}
+		}
 	}
 }

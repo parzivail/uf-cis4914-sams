@@ -115,212 +115,212 @@ public class PlaylistEditor
 
 			ImGui.tableNextColumn();
 
-			if (!playlist.isEmpty())
+			ImGui.pushFont(MainWindow.getSmallFont());
+			if (ImGui.beginTable("##quantityBreakdown", 1 + channels.length, ImGuiTableFlags.BordersH | ImGuiTableFlags.PadOuterX))
 			{
-				ImGui.pushFont(MainWindow.getSmallFont());
-				if (ImGui.beginTable("##quantityBreakdown", 1 + channels.length, ImGuiTableFlags.BordersH | ImGuiTableFlags.PadOuterX))
+				ImGui.tableSetupColumn("stimuliType[]", ImGuiTableColumnFlags.WidthStretch);
+
+				for (var channel : channels)
+					ImGui.tableSetupColumn("channels[]" + channel.getName(), ImGuiTableColumnFlags.WidthFixed, -1);
+
+				ImGui.tableNextColumn();
+
+				for (var channel : channels)
 				{
-					ImGui.tableSetupColumn("stimuliType[]", ImGuiTableColumnFlags.WidthStretch);
-
-					for (var channel : channels)
-						ImGui.tableSetupColumn("channels[]" + channel.getName(), ImGuiTableColumnFlags.WidthFixed, -1);
-
 					ImGui.tableNextColumn();
+					ImGui.text(project.getChannelName(channel));
+				}
 
-					for (var channel : channels)
-					{
-						ImGui.tableNextColumn();
-						ImGui.text(project.getChannelName(channel));
-					}
-
-					for (var type : stimulusTypes)
-					{
-						ImGui.tableNextColumn();
-						ImGui.text(type);
-
-						for (var channel : AudioChannel.values())
-						{
-							ImGui.tableNextColumn();
-							ImGui.text(String.valueOf(
-									playlist.stream()
-									        .filter(e -> e.getStimulus(project).getStimulusType().equals(type) && e.getChannel() == channel)
-									        .count()
-							));
-						}
-					}
-
+				for (var type : stimulusTypes)
+				{
 					ImGui.tableNextColumn();
-					ImGui.textDisabled("Total (%s)".formatted(playlist.size()));
+					ImGui.text(type);
 
 					for (var channel : AudioChannel.values())
 					{
 						ImGui.tableNextColumn();
 						ImGui.text(String.valueOf(
 								playlist.stream()
-								        .filter(e -> e.getChannel() == channel)
+								        .filter(e -> e.getStimulus(project).getStimulusType().equals(type) && e.getChannel() == channel)
 								        .count()
 						));
 					}
-
-					ImGui.endTable();
 				}
-				ImGui.popFont();
 
-				if (ImGui.beginTabBar("playlistTabs"))
+				ImGui.tableNextColumn();
+				ImGui.textDisabled("Total (%s)".formatted(playlist.size()));
+
+				for (var channel : AudioChannel.values())
 				{
-					if (ImGui.beginTabItem("Playlist"))
+					ImGui.tableNextColumn();
+					ImGui.text(String.valueOf(
+							playlist.stream()
+							        .filter(e -> e.getChannel() == channel)
+							        .count()
+					));
+				}
+
+				ImGui.endTable();
+			}
+			ImGui.popFont();
+
+			if (ImGui.beginTabBar("playlistTabs"))
+			{
+				if (ImGui.beginTabItem("Playlist"))
+				{
+					if (ImGui.button("Clear Playlist"))
 					{
-						if (ImGui.button("Clear Playlist"))
+						var button = DialogUtil.notifyChoice("Clear playlist?", "Are you sure? This action is irreversible.", DialogUtil.Icon.WARNING, DialogUtil.ButtonGroup.YESNO, false);
+						if (button == DialogUtil.Button.YES)
 						{
-							var button = DialogUtil.notifyChoice("Clear playlist?", "Are you sure? This action is irreversible.", DialogUtil.Icon.WARNING, DialogUtil.ButtonGroup.YESNO, false);
-							if (button == DialogUtil.Button.YES)
-							{
-								playlist.clear();
-							}
+							playlist.clear();
 						}
-
-						if (ImGui.beginListBox("##playlistList", -1, -1))
-						{
-							if (ImGui.beginTable("playlistList", 2, ImGuiTableFlags.BordersH | ImGuiTableFlags.PadOuterX))
-							{
-								ImGui.tableSetupColumn("body[]", ImGuiTableColumnFlags.WidthStretch);
-								ImGui.tableSetupColumn("actions[]", ImGuiTableColumnFlags.WidthFixed, -1);
-
-								Mutable<InsertData> insertData = new MutableObject<>();
-
-								ListUtil.iterate(playlist, (iterator, i, entry) ->
-								{
-									ImGui.tableNextColumn();
-									ImGui.spacing();
-
-									var stimulus = entry.getStimulus(project);
-									ImGui.textWrapped(stimulus.getSentence());
-
-									ImGui.indent();
-									ImGui.textDisabled(stimulus.getStimulusType());
-									ImGui.unindent();
-
-									ImGui.alignTextToFramePadding();
-									ImGui.textDisabled("Audio channel: ");
-
-									ImGui.sameLine();
-
-									for (var channel : channels)
-									{
-										if (ImGui.radioButton("%s##%s".formatted(project.getChannelName(channel), i), entry.getChannel() == channel))
-											entry.setChannel(channel);
-
-										ImGui.sameLine();
-									}
-
-									ImGui.tableNextColumn();
-
-									final var soundFilename = stimulus.getSampleFilename();
-
-									ImGui.beginDisabled(soundFilename == null);
-									if (ImGui.button("%s##preview%s".formatted(IconFont.play_sound, i), frameSize, frameSize))
-									{
-										AudioUtil.tryPlay(projectManager.pathProjectRelativeToAbsolute(Path.of(stimulus.getSampleFilename())), entry.getChannel());
-									}
-									ImGui.endDisabled();
-
-									ImGui.sameLine();
-
-									ImGui.beginDisabled(i == 0);
-									if (ImGui.button("%s##moveUp%s".formatted(IconFont.tria_up, i), frameSize, frameSize))
-									{
-										insertData.setValue(new InsertData(entry, i - 1));
-										iterator.remove();
-										project.invalidatePlaylist();
-									}
-									ImGui.endDisabled();
-
-									ImGui.sameLine();
-
-									ImGui.beginDisabled(!iterator.hasNext());
-									if (ImGui.button("%s##moveDown%s".formatted(IconFont.tria_down, i), frameSize, frameSize))
-									{
-										insertData.setValue(new InsertData(entry, i + 1));
-										iterator.remove();
-										project.invalidatePlaylist();
-									}
-									ImGui.endDisabled();
-
-									ImGui.sameLine();
-
-									if (ImGui.button("%s##remove%s".formatted(IconFont.trash, i), frameSize, frameSize))
-									{
-										iterator.remove();
-										project.invalidatePlaylist();
-									}
-								});
-
-								if (insertData.getValue() != null)
-								{
-									var value = insertData.getValue();
-									playlist.add(value.index, value.entry);
-								}
-
-								ImGui.endTable();
-							}
-							ImGui.endListBox();
-						}
-
-						ImGui.endTabItem();
 					}
 
-					if (ImGui.beginTabItem("Randomizer"))
+					if (ImGui.beginListBox("##playlistList", -1, -1))
 					{
-						ImGui.combo("##ruleTypes", selectedRandomizerStimulusType, stimulusTypes);
-						ImGui.sameLine();
-						if (ImGui.button("Add Rule"))
-							randomizerRules.add(0, new RandomizerRule(stimulusTypes[selectedRandomizerStimulusType.get()]));
+						if (ImGui.beginTable("playlistList", 2, ImGuiTableFlags.BordersH | ImGuiTableFlags.PadOuterX))
+						{
+							ImGui.tableSetupColumn("body[]", ImGuiTableColumnFlags.WidthStretch);
+							ImGui.tableSetupColumn("actions[]", ImGuiTableColumnFlags.WidthFixed, -1);
 
-						ImGui.separator();
+							Mutable<InsertData> insertData = new MutableObject<>();
 
-						ListUtil.iterate(randomizerRules, (iterator, i, rule) -> {
-							if (!rule.isEverythingElse)
+							if (playlist.isEmpty())
 							{
-								if (ImGui.button(IconFont.trash))
-									iterator.remove();
+								ImGui.tableNextColumn();
+								ImGui.textDisabled("Playlist is empty.");
+								ImGui.tableNextColumn();
+							}
+
+							ListUtil.iterate(playlist, (iterator, i, entry) ->
+							{
+								ImGui.tableNextColumn();
+								ImGui.spacing();
+
+								var stimulus = entry.getStimulus(project);
+								ImGui.textWrapped(stimulus.getSentence());
+
+								ImGui.indent();
+								ImGui.textDisabled(stimulus.getStimulusType());
+								ImGui.unindent();
+
+								ImGui.alignTextToFramePadding();
+								ImGui.textDisabled("Audio channel: ");
 
 								ImGui.sameLine();
-							}
 
-							ImGui.text("Select");
-							ImGui.sameLine();
+								for (var channel : channels)
+								{
+									if (ImGui.radioButton("%s##%s".formatted(project.getChannelName(channel), i), entry.getChannel() == channel))
+										entry.setChannel(channel);
 
-							ImGui.setNextItemWidth(200);
+									ImGui.sameLine();
+								}
 
-							var count = new ImInt(rule.count);
-							if (ImGui.inputInt("##countOf" + rule.stimulusType, count))
-								rule.count = count.get();
+								ImGui.tableNextColumn();
 
-							ImGui.sameLine();
+								final var soundFilename = stimulus.getSampleFilename();
 
-							ImGui.text("of %s".formatted(rule.stimulusType));
-						});
+								ImGui.beginDisabled(soundFilename == null);
+								if (ImGui.button("%s##preview%s".formatted(IconFont.play_sound, i), frameSize, frameSize))
+								{
+									AudioUtil.tryPlay(projectManager.pathProjectRelativeToAbsolute(Path.of(stimulus.getSampleFilename())), entry.getChannel());
+								}
+								ImGui.endDisabled();
 
-						ImGui.separator();
+								ImGui.sameLine();
 
-						if (ImGui.button("Randomize"))
-						{
-							var button = DialogUtil.notifyChoice("Create playlist?", "Are you sure? Your existing playlist will be overwritten. This action is irreversible.", DialogUtil.Icon.WARNING, DialogUtil.ButtonGroup.YESNO, false);
-							if (button == DialogUtil.Button.YES)
+								ImGui.beginDisabled(i == 0);
+								if (ImGui.button("%s##moveUp%s".formatted(IconFont.tria_up, i), frameSize, frameSize))
+								{
+									insertData.setValue(new InsertData(entry, i - 1));
+									iterator.remove();
+									project.invalidatePlaylist();
+								}
+								ImGui.endDisabled();
+
+								ImGui.sameLine();
+
+								ImGui.beginDisabled(!iterator.hasNext());
+								if (ImGui.button("%s##moveDown%s".formatted(IconFont.tria_down, i), frameSize, frameSize))
+								{
+									insertData.setValue(new InsertData(entry, i + 1));
+									iterator.remove();
+									project.invalidatePlaylist();
+								}
+								ImGui.endDisabled();
+
+								ImGui.sameLine();
+
+								if (ImGui.button("%s##remove%s".formatted(IconFont.trash, i), frameSize, frameSize))
+								{
+									iterator.remove();
+									project.invalidatePlaylist();
+								}
+							});
+
+							if (insertData.getValue() != null)
 							{
-								createRandomPlaylist(project);
+								var value = insertData.getValue();
+								playlist.add(value.index, value.entry);
 							}
-						}
 
-						ImGui.endTabItem();
+							ImGui.endTable();
+						}
+						ImGui.endListBox();
 					}
 
-					ImGui.endTabBar();
+					ImGui.endTabItem();
 				}
-			}
-			else
-			{
-				ImGui.textDisabled("Playlist is empty.");
+
+				if (ImGui.beginTabItem("Randomizer"))
+				{
+					ImGui.combo("##ruleTypes", selectedRandomizerStimulusType, stimulusTypes);
+					ImGui.sameLine();
+					if (ImGui.button("Add Rule"))
+						randomizerRules.add(0, new RandomizerRule(stimulusTypes[selectedRandomizerStimulusType.get()]));
+
+					ImGui.separator();
+
+					ListUtil.iterate(randomizerRules, (iterator, i, rule) -> {
+						if (!rule.isEverythingElse)
+						{
+							if (ImGui.button(IconFont.trash))
+								iterator.remove();
+
+							ImGui.sameLine();
+						}
+
+						ImGui.text("Select");
+						ImGui.sameLine();
+
+						ImGui.setNextItemWidth(200);
+
+						var count = new ImInt(rule.count);
+						if (ImGui.inputInt("##countOf" + rule.stimulusType, count))
+							rule.count = count.get();
+
+						ImGui.sameLine();
+
+						ImGui.text("of %s".formatted(rule.stimulusType));
+					});
+
+					ImGui.separator();
+
+					if (ImGui.button("Randomize"))
+					{
+						var button = DialogUtil.notifyChoice("Create playlist?", "Are you sure? Your existing playlist will be overwritten. This action is irreversible.", DialogUtil.Icon.WARNING, DialogUtil.ButtonGroup.YESNO, false);
+						if (button == DialogUtil.Button.YES)
+						{
+							createRandomPlaylist(project);
+						}
+					}
+
+					ImGui.endTabItem();
+				}
+
+				ImGui.endTabBar();
 			}
 
 			ImGui.endTable();

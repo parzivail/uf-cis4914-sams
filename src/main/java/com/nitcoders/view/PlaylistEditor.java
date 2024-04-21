@@ -13,6 +13,8 @@ import com.nitcoders.util.ListUtil;
 import imgui.ImGui;
 import imgui.flag.ImGuiTableColumnFlags;
 import imgui.flag.ImGuiTableFlags;
+import imgui.flag.ImGuiTreeNodeFlags;
+import imgui.type.ImBoolean;
 import imgui.type.ImInt;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -43,6 +45,9 @@ public class PlaylistEditor
 	}
 
 	private static String currentUserId;
+
+	private static AudioChannel randomizerFirstChannel = AudioChannel.Left;
+	private static final ImBoolean randomizerRandomGrouping = new ImBoolean(true);
 	private static final ImInt selectedRandomizerStimulusType = new ImInt();
 	private static final List<RandomizerRule> randomizerRules = new ArrayList<>();
 
@@ -315,44 +320,78 @@ public class PlaylistEditor
 
 				if (ImGui.beginTabItem("Randomizer"))
 				{
-					ImGui.combo("##ruleTypes", selectedRandomizerStimulusType, stimulusTypes);
-					ImGui.sameLine();
-					if (ImGui.button("Add Rule"))
-						randomizerRules.add(0, new RandomizerRule(stimulusTypes[selectedRandomizerStimulusType.get()]));
+					if (ImGui.collapsingHeader("Stimuli Selection", ImGuiTreeNodeFlags.DefaultOpen))
+					{
+						ImGui.combo("##ruleTypes", selectedRandomizerStimulusType, stimulusTypes);
+						ImGui.sameLine();
+						if (ImGui.button("Add Rule"))
+							randomizerRules.add(0, new RandomizerRule(stimulusTypes[selectedRandomizerStimulusType.get()]));
 
-					ImGui.separator();
+						ListUtil.iterate(randomizerRules, (iterator, i, rule) -> {
+							ImGui.bullet();
 
-					ListUtil.iterate(randomizerRules, (iterator, i, rule) -> {
-						if (!rule.isEverythingElse)
-						{
-							if (ImGui.button(IconFont.trash))
-								iterator.remove();
+							if (!rule.isEverythingElse)
+							{
+								if (ImGui.button(IconFont.trash))
+									iterator.remove();
+
+								ImGui.sameLine();
+							}
+
+							ImGui.text("Select");
+							ImGui.sameLine();
+
+							ImGui.setNextItemWidth(200);
+
+							var count = new ImInt(rule.count);
+							if (ImGui.inputInt("##countOf" + rule.stimulusType, count))
+								rule.count = count.get();
 
 							ImGui.sameLine();
-						}
 
-						ImGui.text("Select");
-						ImGui.sameLine();
+							ImGui.text("of %s".formatted(rule.stimulusType));
+						});
+					}
 
-						ImGui.setNextItemWidth(200);
+					if (ImGui.collapsingHeader("Blocking", ImGuiTreeNodeFlags.DefaultOpen))
+					{
+						ImGui.checkbox("Fully random", randomizerRandomGrouping);
 
-						var count = new ImInt(rule.count);
-						if (ImGui.inputInt("##countOf" + rule.stimulusType, count))
-							rule.count = count.get();
+						ImGui.beginDisabled(randomizerRandomGrouping.get());
 
-						ImGui.sameLine();
+						ImGui.text("First block:");
 
-						ImGui.text("of %s".formatted(rule.stimulusType));
-					});
+						if (ImGui.radioButton(project.getChannelName(AudioChannel.Left), randomizerFirstChannel == AudioChannel.Left))
+							randomizerFirstChannel = AudioChannel.Left;
+
+						if (ImGui.radioButton(project.getChannelName(AudioChannel.Both), randomizerFirstChannel == AudioChannel.Both))
+							randomizerFirstChannel = AudioChannel.Both;
+
+						ImGui.endDisabled();
+					}
 
 					ImGui.separator();
 
-					if (ImGui.button("Randomize"))
+					if (ImGui.button("Apply"))
 					{
-						var button = DialogUtil.notifyChoice("Create playlist?", "Are you sure? Your existing playlist will be overwritten. This action is irreversible.", DialogUtil.Icon.WARNING, DialogUtil.ButtonGroup.YESNO, false);
+						var button = DialogUtil.notifyChoice("Overwrite playlist?", "Are you sure? Your existing playlist for this subject will be overwritten. This action is irreversible.", DialogUtil.Icon.WARNING, DialogUtil.ButtonGroup.YESNO, false);
 						if (button == DialogUtil.Button.YES)
 						{
 							createRandomPlaylist(project, currentSubject, playlist);
+						}
+					}
+
+					ImGui.sameLine();
+
+					if (ImGui.button("Apply to ALL subjects"))
+					{
+						var button = DialogUtil.notifyChoice("Overwrite playlists?", "Are you sure? Your existing playlist for ALL SUBJECTS will be overwritten. This action is irreversible.", DialogUtil.Icon.WARNING, DialogUtil.ButtonGroup.YESNO, false);
+						if (button == DialogUtil.Button.YES)
+						{
+							for (var subject : project.getSubjects())
+							{
+								createRandomPlaylist(project, subject, subject.getPlaylist());
+							}
 						}
 					}
 
@@ -364,13 +403,6 @@ public class PlaylistEditor
 
 			ImGui.endTable();
 		}
-	}
-
-	private static AudioChannel getRandomChannel(Random random)
-	{
-		if (random.nextBoolean())
-			return AudioChannel.Both;
-		return AudioChannel.Left;
 	}
 
 	private static void createRandomPlaylist(Project project, Subject subject, List<PlaylistEntry> playlist)
@@ -394,7 +426,7 @@ public class PlaylistEditor
 
 			var result = project.getStimuli().stream()
 			                    // From all the stimuli of this type...
-			                    .filter(stimulus -> stimulus.getStimulusType().equals(rule.stimulusType))
+			                    .filter(stimulus -> stimulus.getStimulusType().equals(rule.stimulusType) && !stimulus.isPractice() && !stimulus.isUnprocessed())
 			                    // ...randomly shuffle them...
 			                    .sorted((left, right) -> rand.nextInt())
 			                    // ...and take the requested quantity
@@ -432,6 +464,21 @@ public class PlaylistEditor
 
 		// Shuffle the resulting playlist.
 		playlist.sort((left, right) -> rand.nextInt());
+
+		if (!randomizerRandomGrouping.get())
+		{
+			// Block the groups by the first channel
+			var tempPlaylist = playlist.stream().toList();
+			playlist.clear();
+
+			for (var entry : tempPlaylist)
+			{
+				if (entry.getChannel() == randomizerFirstChannel)
+					playlist.add(0, entry);
+				else
+					playlist.add(entry);
+			}
+		}
 
 		project.invalidatePracticePlaylist();
 		subject.invalidatePlaylist(project);

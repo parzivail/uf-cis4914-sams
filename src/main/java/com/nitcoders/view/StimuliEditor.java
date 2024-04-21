@@ -43,7 +43,7 @@ public class StimuliEditor
 				if (ImGui.button("New Stimulus", -1, frameSize))
 				{
 					var stimuliType = stimulusTypes[selectedStimulusType.get()];
-					stimuli.add(0, currentlyEditingStimulus = new Stimulus("Sentence", stimuliType, null, false));
+					stimuli.add(0, currentlyEditingStimulus = new Stimulus("Sentence", stimuliType));
 					project.invalidateStimuliMap();
 				}
 
@@ -101,6 +101,12 @@ public class StimuliEditor
 						{
 							ImGui.sameLine();
 							ImGui.textDisabled("(Practice only)");
+						}
+
+						if (stimulus.isUnprocessed())
+						{
+							ImGui.sameLine();
+							ImGui.textDisabled("(Unprocessed)");
 						}
 
 						if (stimulus.getSampleFilename() == null)
@@ -169,7 +175,7 @@ public class StimuliEditor
 
 		if (ImGui.beginTable("stimulusEditor", 2))
 		{
-			ImGui.tableSetupColumn("label", ImGuiTableColumnFlags.WidthFixed, 100);
+			ImGui.tableSetupColumn("label", ImGuiTableColumnFlags.WidthFixed, 150);
 			ImGui.tableSetupColumn("field", ImGuiTableColumnFlags.WidthStretch);
 
 			var typeInt = new ImInt(project.getStimulusTypes().indexOf(currentlyEditingStimulus.getStimulusType()));
@@ -199,6 +205,20 @@ public class StimuliEditor
 				currentlyEditingStimulus.setPractice(isPractice.get());
 				project.invalidatePlaylist();
 			}
+
+			ImGui.beginDisabled(!currentlyEditingStimulus.isPractice());
+			ImGui.tableNextColumn();
+
+			ImGui.text("Unprocessed Audio");
+
+			ImGui.tableNextColumn();
+			var isUnprocessed = new ImBoolean(currentlyEditingStimulus.isUnprocessed());
+			if (ImGui.checkbox("##unprocessed", isUnprocessed))
+			{
+				currentlyEditingStimulus.setUnprocessed(isUnprocessed.get());
+				project.invalidatePlaylist();
+			}
+			ImGui.endDisabled();
 
 			ImGui.tableNextColumn();
 			ImGui.text("Audio Sample");

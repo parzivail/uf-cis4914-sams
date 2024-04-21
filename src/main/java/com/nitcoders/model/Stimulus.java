@@ -10,14 +10,13 @@ public class Stimulus
 	private String stimulusType;
 	private String sampleFilename;
 	private boolean isPractice;
+	private boolean isUnprocessed;
 
-	public Stimulus(String sentence, String stimulusType, String sampleFilename, boolean isPractice)
+	public Stimulus(String sentence, String stimulusType)
 	{
 		this.id = UUID.randomUUID().toString();
 		this.sentence = sentence;
 		this.stimulusType = stimulusType;
-		this.sampleFilename = sampleFilename;
-		this.isPractice = isPractice;
 	}
 
 	public String getId()
@@ -53,6 +52,16 @@ public class Stimulus
 	public void setSampleFilename(String sampleFilename)
 	{
 		this.sampleFilename = sampleFilename;
+	}
+
+	public boolean isUnprocessed()
+	{
+		return isUnprocessed;
+	}
+
+	public void setUnprocessed(boolean unprocessed)
+	{
+		isUnprocessed = unprocessed;
 	}
 
 	public boolean isPractice()

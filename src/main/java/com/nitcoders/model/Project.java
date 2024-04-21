@@ -113,6 +113,12 @@ public class Project
 				if (!stimulus.isPractice())
 					continue;
 
+				if (stimulus.isUnprocessed())
+				{
+					bakedPracticePlaylist.add(new PlaylistEntry(stimulus, AudioChannel.Both));
+					continue;
+				}
+
 				for (var channel : AudioChannel.values())
 					bakedPracticePlaylist.add(new PlaylistEntry(stimulus, channel));
 			}

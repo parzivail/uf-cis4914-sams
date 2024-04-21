@@ -46,12 +46,19 @@ public class AdministerView
 
 		var channels = entry.getChannel();
 
-		ImGui.textDisabled("%s %s   %s %s".formatted(
-				project.getChannelName(AudioChannel.Left),
-				channels != AudioChannel.Right ? IconFont.mute_ipo_on : IconFont.mute_ipo_off,
-				project.getChannelName(AudioChannel.Right),
-				channels != AudioChannel.Left ? IconFont.mute_ipo_on : IconFont.mute_ipo_off
-		));
+		if (stimulus.isUnprocessed())
+		{
+			ImGui.textDisabled("%s L+R (Unprocessed)".formatted(IconFont.mute_ipo_on));
+		}
+		else
+		{
+			ImGui.textDisabled("%s %s   %s %s".formatted(
+					channels != AudioChannel.Right ? IconFont.mute_ipo_on : IconFont.mute_ipo_off,
+					project.getChannelName(AudioChannel.Left),
+					channels != AudioChannel.Left ? IconFont.mute_ipo_on : IconFont.mute_ipo_off,
+					project.getChannelName(AudioChannel.Right)
+			));
+		}
 
 		ImGui.popFont();
 		ImGui.unindent();
@@ -107,7 +114,9 @@ public class AdministerView
 			for (var i = 0; i < playlistSize; i++)
 			{
 				var queueEntry = playlist.get(i);
-				if (ImGui.selectable("(%s) %s (%s)".formatted(i + 1, queueEntry.getStimulus(project).getSentence(), project.getChannelName(queueEntry.getChannel())), i == currentEntry))
+				var stim = queueEntry.getStimulus(project);
+				var channelName = stim.isUnprocessed() ? "L+R Unprocessed" : project.getChannelName(queueEntry.getChannel());
+				if (ImGui.selectable("(%s) %s (%s)".formatted(i + 1, stim.getSentence(), channelName), i == currentEntry))
 					currentEntry = i;
 			}
 			ImGui.endListBox();

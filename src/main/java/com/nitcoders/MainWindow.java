@@ -167,7 +167,7 @@ public class MainWindow extends Application
 
 			if (ImGui.beginTabItem("Administer"))
 			{
-				AdministerView.draw(projectManager, projectManager.getProject(), projectManager.getProject().getBakedPlaylist());
+				AdministerView.draw(projectManager, projectManager.getProject(), null);
 				ImGui.endTabItem();
 			}
 

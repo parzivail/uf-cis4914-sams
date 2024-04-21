@@ -151,6 +151,7 @@ public class StimuliEditor
 							{
 								iterator.remove();
 								project.invalidateStimuliMap();
+								project.invalidateAllPlaylists();
 							}
 						}
 					});
@@ -203,7 +204,7 @@ public class StimuliEditor
 			if (ImGui.checkbox("##practiceOnly", isPractice))
 			{
 				currentlyEditingStimulus.setPractice(isPractice.get());
-				project.invalidatePlaylist();
+				project.invalidateAllPlaylists();
 			}
 
 			ImGui.beginDisabled(!currentlyEditingStimulus.isPractice());
@@ -216,7 +217,7 @@ public class StimuliEditor
 			if (ImGui.checkbox("##unprocessed", isUnprocessed))
 			{
 				currentlyEditingStimulus.setUnprocessed(isUnprocessed.get());
-				project.invalidatePlaylist();
+				project.invalidateAllPlaylists();
 			}
 			ImGui.endDisabled();
 

@@ -5,6 +5,7 @@ import com.nitcoders.MainWindow;
 import com.nitcoders.ProjectManager;
 import com.nitcoders.model.PlaylistEntry;
 import com.nitcoders.model.Project;
+import com.nitcoders.model.Subject;
 import com.nitcoders.util.AudioChannel;
 import com.nitcoders.util.AudioUtil;
 import com.nitcoders.util.DialogUtil;
@@ -41,6 +42,7 @@ public class PlaylistEditor
 	{
 	}
 
+	private static String currentUserId;
 	private static final ImInt selectedRandomizerStimulusType = new ImInt();
 	private static final List<RandomizerRule> randomizerRules = new ArrayList<>();
 
@@ -53,6 +55,37 @@ public class PlaylistEditor
 
 	public static void draw(ProjectManager projectManager, Project project)
 	{
+		var subjectMap = project.getSubjectMap();
+
+		if (!subjectMap.containsKey(currentUserId))
+			currentUserId = null;
+
+		var currentSubject = subjectMap.get(currentUserId);
+
+		var subjectPreviewStr = "Select a subject";
+		if (currentSubject != null)
+			subjectPreviewStr = currentSubject.getId();
+
+		ImGui.text("Subject:");
+
+		if (ImGui.beginCombo("##scoringSubject", subjectPreviewStr))
+		{
+			for (var subject : project.getSubjects())
+			{
+				if (ImGui.selectable(subject.getId()))
+					currentUserId = subject.getId();
+			}
+			ImGui.endCombo();
+		}
+
+		if (currentSubject == null)
+		{
+			ImGui.textDisabled("No subject selected.");
+			return;
+		}
+
+		var playlist = currentSubject.getPlaylist();
+
 		var innerSize = ImGui.getContentRegionAvail();
 		if (ImGui.beginTable("entryTable", 2, ImGuiTableFlags.Resizable | ImGuiTableFlags.NoHostExtendY, innerSize.x, innerSize.y))
 		{
@@ -62,8 +95,6 @@ public class PlaylistEditor
 			ImGui.tableNextColumn();
 
 			var frameSize = ImGui.getFrameHeight();
-
-			var playlist = project.getPlaylist();
 
 			var channels = AudioChannel.values();
 
@@ -104,7 +135,9 @@ public class PlaylistEditor
 						if (ImGui.button("%s##add%s".formatted(IconFont.add, i), frameSize, frameSize))
 						{
 							playlist.add(0, new PlaylistEntry(stimulus, AudioChannel.Both));
-							project.invalidatePlaylist();
+
+							currentSubject.invalidatePlaylist(project);
+							project.invalidatePracticePlaylist();
 						}
 					});
 
@@ -236,7 +269,9 @@ public class PlaylistEditor
 								{
 									insertData.setValue(new InsertData(entry, i - 1));
 									iterator.remove();
-									project.invalidatePlaylist();
+
+									currentSubject.invalidatePlaylist(project);
+									project.invalidatePracticePlaylist();
 								}
 								ImGui.endDisabled();
 
@@ -247,7 +282,9 @@ public class PlaylistEditor
 								{
 									insertData.setValue(new InsertData(entry, i + 1));
 									iterator.remove();
-									project.invalidatePlaylist();
+
+									currentSubject.invalidatePlaylist(project);
+									project.invalidatePracticePlaylist();
 								}
 								ImGui.endDisabled();
 
@@ -256,7 +293,9 @@ public class PlaylistEditor
 								if (ImGui.button("%s##remove%s".formatted(IconFont.trash, i), frameSize, frameSize))
 								{
 									iterator.remove();
-									project.invalidatePlaylist();
+
+									currentSubject.invalidatePlaylist(project);
+									project.invalidatePracticePlaylist();
 								}
 							});
 
@@ -313,7 +352,7 @@ public class PlaylistEditor
 						var button = DialogUtil.notifyChoice("Create playlist?", "Are you sure? Your existing playlist will be overwritten. This action is irreversible.", DialogUtil.Icon.WARNING, DialogUtil.ButtonGroup.YESNO, false);
 						if (button == DialogUtil.Button.YES)
 						{
-							createRandomPlaylist(project);
+							createRandomPlaylist(project, currentSubject, playlist);
 						}
 					}
 
@@ -334,10 +373,8 @@ public class PlaylistEditor
 		return AudioChannel.Left;
 	}
 
-	private static void createRandomPlaylist(Project project)
+	private static void createRandomPlaylist(Project project, Subject subject, List<PlaylistEntry> playlist)
 	{
-		var playlist = project.getPlaylist();
-
 		playlist.clear();
 
 		var rand = new Random();
@@ -396,6 +433,7 @@ public class PlaylistEditor
 		// Shuffle the resulting playlist.
 		playlist.sort((left, right) -> rand.nextInt());
 
-		project.invalidatePlaylist();
+		project.invalidatePracticePlaylist();
+		subject.invalidatePlaylist(project);
 	}
 }

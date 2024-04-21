@@ -21,7 +21,54 @@ public class ScoreView
 
 	public static void draw(Project project)
 	{
-		var playlist = project.getBakedPlaylist();
+		var subjectMap = project.getSubjectMap();
+
+		if (!subjectMap.containsKey(currentUserId))
+			currentUserId = null;
+
+		var currentSubject = subjectMap.get(currentUserId);
+
+		var subjectPreviewStr = "Select a subject";
+		if (currentSubject != null)
+		{
+			var subjectPlaylist = currentSubject.getBakedPlaylist();
+			var playlistSize = subjectPlaylist.size();
+
+			var scoredCount = subjectPlaylist.stream()
+			                                 .filter(e -> currentSubject.getScores().containsKey(e.getStimulus(project).getSentence()))
+			                                 .count();
+			var isComplete = scoredCount == playlistSize;
+
+			subjectPreviewStr = "%s%s (%s/%s)".formatted(isComplete ? IconFont.checkmark + " " : "", currentSubject.getId(), scoredCount, playlistSize);
+		}
+
+		ImGui.text("Subject:");
+
+		if (ImGui.beginCombo("##scoringSubject", subjectPreviewStr))
+		{
+			for (var subject : project.getSubjects())
+			{
+				var subjectPlaylist = subject.getBakedPlaylist();
+				var playlistSize = subjectPlaylist.size();
+
+				var scoredCount = subjectPlaylist.stream()
+				                                 .filter(e -> subject.getScores().containsKey(e.getStimulus(project).getSentence()))
+				                                 .count();
+				var isComplete = scoredCount == playlistSize;
+
+				if (ImGui.selectable("%s%s (%s/%s)".formatted(isComplete ? IconFont.checkmark + " " : "", subject.getId(), scoredCount, playlistSize)))
+					currentUserId = subject.getId();
+			}
+			ImGui.endCombo();
+		}
+
+		if (currentSubject == null)
+		{
+			ImGui.textDisabled("No subject selected.");
+			return;
+		}
+
+		var playlist = currentSubject.getBakedPlaylist();
 
 		if (playlist.isEmpty())
 		{
@@ -38,47 +85,6 @@ public class ScoreView
 
 		var entry = playlist.get(currentEntry);
 		var stimulus = entry.getStimulus(project);
-
-		var subjectMap = project.getSubjectMap();
-
-		if (!subjectMap.containsKey(currentUserId))
-			currentUserId = null;
-
-		var currentSubject = subjectMap.get(currentUserId);
-
-		var subjectPreviewStr = "Select a subject";
-		if (currentSubject != null)
-		{
-			var scoredCount = playlist.stream()
-			                          .filter(e -> currentSubject.getScores().containsKey(e.getStimulus(project).getSentence()))
-			                          .count();
-			var isComplete = scoredCount == playlistSize;
-
-			subjectPreviewStr = "%s%s (%s/%s)".formatted(isComplete ? IconFont.checkmark + " " : "", currentSubject.getId(), scoredCount, playlistSize);
-		}
-
-		ImGui.text("Subject:");
-
-		if (ImGui.beginCombo("##scoringSubject", subjectPreviewStr))
-		{
-			for (var subject : project.getSubjects())
-			{
-				var scoredCount = playlist.stream()
-				                          .filter(e -> subject.getScores().containsKey(e.getStimulus(project).getSentence()))
-				                          .count();
-				var isComplete = scoredCount == playlistSize;
-
-				if (ImGui.selectable("%s%s (%s/%s)".formatted(isComplete ? IconFont.checkmark + " " : "", subject.getId(), scoredCount, playlistSize)))
-					currentUserId = subject.getId();
-			}
-			ImGui.endCombo();
-		}
-
-		if (currentSubject == null)
-		{
-			ImGui.textDisabled("No subject selected.");
-			return;
-		}
 
 		ImGui.text("Sentence %s of %s".formatted(currentEntry + 1, playlistSize));
 

@@ -5,20 +5,21 @@ import com.nitcoders.util.DialogUtil;
 
 import java.io.PrintWriter;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Project
 {
 	private transient Map<String, Stimulus> stimuliMap = null;
 	private transient Map<String, Subject> subjectMap = null;
-	private transient List<PlaylistEntry> bakedPlaylist = null;
 	private transient List<PlaylistEntry> bakedPracticePlaylist = null;
 
 	private List<String> stimulusTypes = new ArrayList<>();
 	private List<Stimulus> stimuli = new ArrayList<>();
 	private List<Subject> subjects = new ArrayList<>();
-	private List<PlaylistEntry> playlist = new ArrayList<>();
 
 	private HashMap<AudioChannel, String> channelNames = new HashMap<>();
 
@@ -38,14 +39,8 @@ public class Project
 		return channelNames.get(channel);
 	}
 
-	public List<PlaylistEntry> getPlaylist()
+	public void invalidatePracticePlaylist()
 	{
-		return playlist;
-	}
-
-	public void invalidatePlaylist()
-	{
-		bakedPlaylist = null;
 		bakedPracticePlaylist = null;
 	}
 
@@ -92,14 +87,6 @@ public class Project
 					.collect(Collectors.toMap(Subject::getId, o -> o));
 
 		return subjectMap;
-	}
-
-	public List<PlaylistEntry> getBakedPlaylist()
-	{
-		if (bakedPlaylist == null)
-			bakedPlaylist = Collections.unmodifiableList(playlist);
-
-		return bakedPlaylist;
 	}
 
 	public List<PlaylistEntry> getBakedPracticePlaylist()
@@ -209,11 +196,17 @@ public class Project
 		{
 			sw.println("Subject,Total Words,Words Correct Proportion,Total Sentences,Sentences Correct Proportion");
 
-			scores.forEach(stat -> sw.println("\"%s\",%s,%s".formatted(stat.subjectId(), stat.totalWords(), stat.wordsCorrectProportion(), stat.totalSentences(), stat.sentencesCorrectProportion())));
+			scores.forEach(stat -> sw.println("\"%s\",%s,%s,%s,%s".formatted(stat.subjectId(), stat.totalWords(), stat.wordsCorrectProportion(), stat.totalSentences(), stat.sentencesCorrectProportion())));
 		}
 		catch (Exception e)
 		{
 			DialogUtil.notify("Unable to save scores", "Unable to save scores! Error while saving %s: %s".formatted(filename.toString(), e.getMessage()), DialogUtil.Icon.ERROR);
 		}
+	}
+
+	public void invalidateAllPlaylists()
+	{
+		invalidatePracticePlaylist();
+		subjects.forEach(subject -> subject.invalidatePlaylist(this));
 	}
 }

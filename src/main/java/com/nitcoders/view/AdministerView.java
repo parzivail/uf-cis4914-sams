@@ -15,6 +15,7 @@ import java.util.List;
 
 public class AdministerView
 {
+	private static String currentUserId;
 	private static List<PlaylistEntry> previousPlaylist = null;
 	private static int currentEntry = 0;
 
@@ -22,6 +23,42 @@ public class AdministerView
 
 	public static void draw(ProjectManager projectManager, Project project, List<PlaylistEntry> playlist)
 	{
+		if (playlist == null)
+		{
+			// Subject-based playlist
+
+			var subjectMap = project.getSubjectMap();
+
+			if (!subjectMap.containsKey(currentUserId))
+				currentUserId = null;
+
+			var currentSubject = subjectMap.get(currentUserId);
+
+			var subjectPreviewStr = "Select a subject";
+			if (currentSubject != null)
+				subjectPreviewStr = currentSubject.getId();
+
+			ImGui.text("Subject:");
+
+			if (ImGui.beginCombo("##scoringSubject", subjectPreviewStr))
+			{
+				for (var subject : project.getSubjects())
+				{
+					if (ImGui.selectable(subject.getId()))
+						currentUserId = subject.getId();
+				}
+				ImGui.endCombo();
+			}
+
+			if (currentSubject == null)
+			{
+				ImGui.textDisabled("No subject selected.");
+				return;
+			}
+
+			playlist = currentSubject.getBakedPlaylist();
+		}
+
 		if (playlist.isEmpty())
 		{
 			ImGui.textDisabled("Playlist is empty. Nothing to play.");

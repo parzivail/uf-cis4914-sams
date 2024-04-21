@@ -131,6 +131,8 @@ public class Project
 	{
 		var folder = Path.of(path);
 
+		var scores = new ArrayList<SubjectSummaryStatistics>();
+
 		for (var subject : subjects)
 		{
 			var filename = folder.resolve("%s.csv".formatted(subject.getId()));
@@ -152,12 +154,66 @@ public class Project
 
 					sw.println();
 				});
+
+				sw.println();
+				sw.println();
+
+				sw.println("Statistic,Value");
+
+				var totalWords = 0;
+				var totalSentences = 0;
+
+				var correctSentences = 0;
+				var correctWords = 0;
+
+				for (var sentenceScore : subject.getScores().values())
+				{
+					var isSentenceCorrect = true;
+					for (var word : sentenceScore)
+					{
+						if (word)
+							correctWords++;
+						else
+							isSentenceCorrect = false;
+
+						totalWords++;
+					}
+
+					if (isSentenceCorrect)
+						correctSentences++;
+
+					totalSentences++;
+				}
+
+				var stats = new SubjectSummaryStatistics(
+						subject.getId(),
+						totalWords,
+						totalSentences,
+						correctWords / (float)totalWords,
+						correctSentences / (float)totalSentences
+				);
+				scores.add(stats);
+
+				sw.println("Words correct,%s".formatted(stats.wordsCorrectProportion()));
+				sw.println("Sentences correct,%s".formatted(stats.sentencesCorrectProportion()));
 			}
 			catch (Exception e)
 			{
 				DialogUtil.notify("Unable to save scores", "Unable to save scores! Error while saving %s: %s".formatted(filename.toString(), e.getMessage()), DialogUtil.Icon.ERROR);
 				break;
 			}
+		}
+
+		var filename = folder.resolve("summary.csv");
+		try (var sw = new PrintWriter(filename.toFile()))
+		{
+			sw.println("Subject,Total Words,Words Correct Proportion,Total Sentences,Sentences Correct Proportion");
+
+			scores.forEach(stat -> sw.println("\"%s\",%s,%s".formatted(stat.subjectId(), stat.totalWords(), stat.wordsCorrectProportion(), stat.totalSentences(), stat.sentencesCorrectProportion())));
+		}
+		catch (Exception e)
+		{
+			DialogUtil.notify("Unable to save scores", "Unable to save scores! Error while saving %s: %s".formatted(filename.toString(), e.getMessage()), DialogUtil.Icon.ERROR);
 		}
 	}
 }

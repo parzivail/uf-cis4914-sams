@@ -67,17 +67,17 @@ public class MainWindow extends Application
 		{
 			io.getFonts().addFontFromMemoryTTF(Files.readAllBytes(Path.of("C:\\Windows\\Fonts\\segoeui.ttf")), 20, fontConfig);
 			fontConfig.setMergeMode(true);
-			io.getFonts().addFontFromMemoryTTF(IoUtil.getBytes("fonts\\icons.ttf"), 20, fontConfig, IconFont.ICON_RANGE);
+			io.getFonts().addFontFromMemoryTTF(IoUtil.getBytes("/fonts/icons.ttf"), 20, fontConfig, IconFont.ICON_RANGE);
 
 			fontConfig.setMergeMode(false);
 			smallFont = io.getFonts().addFontFromMemoryTTF(Files.readAllBytes(Path.of("C:\\Windows\\Fonts\\segoeui.ttf")), 18, fontConfig);
 			fontConfig.setMergeMode(true);
-			io.getFonts().addFontFromMemoryTTF(IoUtil.getBytes("fonts\\icons.ttf"), 18, fontConfig, IconFont.ICON_RANGE);
+			io.getFonts().addFontFromMemoryTTF(IoUtil.getBytes("/fonts/icons.ttf"), 18, fontConfig, IconFont.ICON_RANGE);
 
 			fontConfig.setMergeMode(false);
 			largeFont = io.getFonts().addFontFromMemoryTTF(Files.readAllBytes(Path.of("C:\\Windows\\Fonts\\segoeui.ttf")), 48, fontConfig);
 			fontConfig.setMergeMode(true);
-			io.getFonts().addFontFromMemoryTTF(IoUtil.getBytes("fonts\\icons.ttf"), 48, fontConfig, IconFont.ICON_RANGE);
+			io.getFonts().addFontFromMemoryTTF(IoUtil.getBytes("/fonts/icons.ttf"), 48, fontConfig, IconFont.ICON_RANGE);
 
 			io.getFonts().build();
 		}

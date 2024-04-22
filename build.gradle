@@ -2,6 +2,8 @@ plugins {
     id 'java'
 }
 
+apply plugin: 'java-library'
+
 group = 'com.nitcoders'
 version = '1.0-SNAPSHOT'
 
@@ -22,6 +24,18 @@ dependencies {
 
     implementation "org.lwjgl:lwjgl-tinyfd:3.1.2-SNAPSHOT"
     runtimeOnly group: "org.lwjgl", name: "lwjgl-tinyfd", version: "3.1.2-SNAPSHOT", classifier: "natives-windows"
+}
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'com.nitcoders.MainWindow'
+    }
+    duplicatesStrategy "exclude"
+    archiveClassifier = "all"
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
 }
 
 test {

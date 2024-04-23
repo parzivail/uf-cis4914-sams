@@ -119,7 +119,7 @@ public class ScoreView
 			ImGui.pushStyleColor(ImGuiCol.ButtonHovered, ImColor.hsl(hue, 0.7f, 0.6f));
 			ImGui.pushStyleColor(ImGuiCol.ButtonActive, ImColor.hsl(hue, 0.8f, 0.7f));
 
-			if (ImGui.button(wordParts[i]))
+			if (ImGui.button("%s##%s".formatted(wordParts[i], i)))
 			{
 				currentScore[i] = !currentScore[i];
 				currentSubject.getScores().put(stimulus.getSentence(), currentScore);

@@ -125,12 +125,13 @@ public class Project
 			var filename = folder.resolve("%s.csv".formatted(subject.getId()));
 			try (var sw = new PrintWriter(filename.toFile()))
 			{
-				sw.println("Sentence,1st word correct,2nd word correct,...,Nth word correct");
+				sw.println("Sentence,Stimulus type,Channels stimulated,Channels stimulated (label),1st word correct,2nd word correct,...,Nth word correct");
 
-				subject.getScores().keySet().stream().sorted().forEachOrdered(sentence -> {
-					sw.print('"');
-					sw.print(sentence);
-					sw.print('"');
+				subject.getBakedPlaylist().stream().sorted().forEachOrdered(entry -> {
+					var stim = entry.getStimulus(this);
+					var sentence = stim.getSentence();
+
+					sw.print("\"%s\",\"%s\",\"%s\",\"%s\"".formatted(sentence, stim.getStimulusType(), entry.getChannel().getName(), getChannelName(entry.getChannel())));
 
 					var parts = subject.getScores().get(sentence);
 					for (var part : parts)

@@ -118,8 +118,6 @@ public class Project
 	{
 		var folder = Path.of(path);
 
-		var scores = new ArrayList<SubjectSummaryStatistics>();
-
 		for (var subject : subjects)
 		{
 			var filename = folder.resolve("%s.csv".formatted(subject.getId()));
@@ -173,35 +171,16 @@ public class Project
 					totalSentences++;
 				}
 
-				var stats = new SubjectSummaryStatistics(
-						subject.getId(),
-						totalWords,
-						totalSentences,
-						correctWords / (float)totalWords,
-						correctSentences / (float)totalSentences
-				);
-				scores.add(stats);
-
-				sw.println("Words correct,%s".formatted(stats.wordsCorrectProportion()));
-				sw.println("Sentences correct,%s".formatted(stats.sentencesCorrectProportion()));
+				sw.println("Total words,%s".formatted(totalWords));
+				sw.println("Words correct,%s".formatted(correctWords / (float)totalWords));
+				sw.println("Total sentences,%s".formatted(totalSentences));
+				sw.println("Sentences correct,%s".formatted(correctSentences / (float)totalSentences));
 			}
 			catch (Exception e)
 			{
 				DialogUtil.notify("Unable to save scores", "Unable to save scores! Error while saving %s: %s".formatted(filename.toString(), e.getMessage()), DialogUtil.Icon.ERROR);
 				break;
 			}
-		}
-
-		var filename = folder.resolve("summary.csv");
-		try (var sw = new PrintWriter(filename.toFile()))
-		{
-			sw.println("Subject,Total Words,Words Correct Proportion,Total Sentences,Sentences Correct Proportion");
-
-			scores.forEach(stat -> sw.println("\"%s\",%s,%s,%s,%s".formatted(stat.subjectId(), stat.totalWords(), stat.wordsCorrectProportion(), stat.totalSentences(), stat.sentencesCorrectProportion())));
-		}
-		catch (Exception e)
-		{
-			DialogUtil.notify("Unable to save scores", "Unable to save scores! Error while saving %s: %s".formatted(filename.toString(), e.getMessage()), DialogUtil.Icon.ERROR);
 		}
 	}
 

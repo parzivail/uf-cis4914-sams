@@ -65,6 +65,7 @@ public class StimulusTypesEditor
 							{
 								iterator.remove();
 								project.getStimuli().removeIf(stimuli -> stimuli.getStimulusType().equals(stimuliType));
+								StimuliEditor.invalidateCurrentEditor(project);
 							}
 						}
 					});

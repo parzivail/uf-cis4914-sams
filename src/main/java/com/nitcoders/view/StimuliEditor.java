@@ -237,4 +237,10 @@ public class StimuliEditor
 			ImGui.endTable();
 		}
 	}
+
+	public static void invalidateCurrentEditor(Project project)
+	{
+		if (!project.getStimuli().contains(currentlyEditingStimulus))
+			currentlyEditingStimulus = null;
+	}
 }
